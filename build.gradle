@@ -1,0 +1,32 @@
+plugins {
+    id("java")
+    id("groovy")
+    id("com.gradleup.shadow") version "9.0.1"
+}
+
+apply plugin: "com.gradleup.shadow"
+
+group = "org.loveroo.sillytts"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("com.1stleg:jnativehook:2.1.0")
+    compileOnly("com.1stleg:jnativehook:2.1.0")
+    
+    implementation("org.json:json:20090211")
+    compileOnly("org.json:json:20090211")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+}
+
+tasks.withType(Jar).configureEach {
+    manifest {
+        attributes["Main-Class"] = "org.loveroo.sillytts.Main"
+    }
+}

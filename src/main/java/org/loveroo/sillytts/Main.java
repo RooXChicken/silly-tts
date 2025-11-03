@@ -1,0 +1,82 @@
+package org.loveroo.sillytts;
+
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.UIManager;
+
+import org.jnativehook.GlobalScreen;
+import org.loveroo.sillytts.config.Config;
+import org.loveroo.sillytts.keybind.Keybind;
+import org.loveroo.sillytts.window.TTSInputWindow;
+
+public class Main {
+
+    private static final Config CONFIG = new Config();
+
+    private static Font font;
+    private static TTSInputWindow ttsInputWindow;
+
+    public static void main(String[] args) {
+        final var logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
+
+        try {
+            var fontStream = Main.class.getResourceAsStream("/CascadiaMono-Bold.ttf");
+
+            if(fontStream != null) {
+                font = Font.createFonts(fontStream)[0];
+                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
+            }
+            else {
+                System.out.println("Failed to load font! Stream is null!");
+                return;
+            }
+        }
+        catch(Exception e) {
+            System.out.println("Failed to load font! " + e);
+            return;
+        }
+
+        CONFIG.load();
+        CONFIG.save();
+
+        UIManager.put("Caret.width", 2);
+
+        ttsInputWindow = new TTSInputWindow();
+        setEnabled(false);
+
+        try
+        {
+            GlobalScreen.registerNativeHook();
+            GlobalScreen.addNativeKeyListener(Keybind.OPEN_TTS_WINDOW_KEYBIND.getNativeListener());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setEnabled(boolean enabled) {
+        if(enabled) {
+            ttsInputWindow.setState(Frame.NORMAL);
+        }
+        else {
+            ttsInputWindow.minimize();
+        }
+    }
+
+    public static Config getConfig() {
+        return CONFIG;
+    }
+
+    public static Font getFont() {
+        return font;
+    }
+
+    public static TTSInputWindow getTTSWindow() {
+        return ttsInputWindow;
+    }
+}
