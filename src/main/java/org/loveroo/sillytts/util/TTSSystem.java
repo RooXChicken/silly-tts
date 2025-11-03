@@ -7,10 +7,18 @@ import org.loveroo.sillytts.Main;
 
 public class TTSSystem {
     
+    /**
+     * Wraps {@link TTSSystem#sendRawTTSString(String)} in {@link TTSSystem#replaceText(String)} for proper formatting and text replacement
+     * @param input The text
+     */
     public static void sendTTSString(String input) {
         sendRawTTSString(replaceText(input));
     }
 
+    /**
+     * Sends the input over to Piper, which further passes it along to {@link AudioSystem#playSoundFromStream(java.io.InputStream)}
+     * @param input The text
+     */
     public static void sendRawTTSString(String input) {
         var thread = new TTSThread(input);
         thread.start();
@@ -45,6 +53,8 @@ public class TTSSystem {
         @Override
         public void run() {
             try {
+                // pipe echo into piper for file-less playback
+
                 var processes = ProcessBuilder.startPipeline(List.of(
                     new ProcessBuilder(new String[] { "echo", input })
                         .inheritIO()
@@ -53,6 +63,7 @@ public class TTSSystem {
                         .redirectError(Redirect.DISCARD)
                 ));
 
+                // play the audio from the stream
                 AudioSystem.playSoundFromStream(processes.get(processes.size()-1).getInputStream());
             }
             catch(Exception e) {

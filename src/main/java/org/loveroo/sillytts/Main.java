@@ -11,6 +11,7 @@ import javax.swing.UIManager;
 import org.jnativehook.GlobalScreen;
 import org.loveroo.sillytts.config.Config;
 import org.loveroo.sillytts.keybind.Keybind;
+import org.loveroo.sillytts.util.AudioSystem;
 import org.loveroo.sillytts.window.TTSInputWindow;
 
 public class Main {
@@ -21,6 +22,7 @@ public class Main {
     private static TTSInputWindow ttsInputWindow;
 
     public static void main(String[] args) {
+        // turns off the logging for the native hook
         final var logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.OFF);
 
@@ -49,6 +51,9 @@ public class Main {
         ttsInputWindow = new TTSInputWindow();
         setEnabled(false);
 
+        AudioSystem.init();
+        Runtime.getRuntime().addShutdownHook(new Thread(AudioSystem::shutdown));
+
         try
         {
             GlobalScreen.registerNativeHook();
@@ -59,6 +64,10 @@ public class Main {
         }
     }
 
+    /**
+     * Controls whether the window is shown
+     * @param enabled The window's visibility
+     */
     public static void setEnabled(boolean enabled) {
         if(enabled) {
             ttsInputWindow.setState(Frame.NORMAL);
@@ -68,14 +77,26 @@ public class Main {
         }
     }
 
+    /**
+     * Gets the app config
+     * @return The config
+     */
     public static Config getConfig() {
         return CONFIG;
     }
 
+    /**
+     * Gets the main app font
+     * @return The font
+     */
     public static Font getFont() {
         return font;
     }
 
+    /**
+     * Gets the main TTS window
+     * @return The TTS window
+     */
     public static TTSInputWindow getTTSWindow() {
         return ttsInputWindow;
     }

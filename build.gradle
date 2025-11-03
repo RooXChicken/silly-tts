@@ -11,6 +11,16 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+
+    // maven {
+    //     name = "jogamp"
+    //     url = "https://jogamp.org/deployment/maven"
+    // }
+
+    // maven {
+    //     name = "urish"
+    //     url = "https://repo1.maven.org/maven2"
+    // }
 }
 
 dependencies {
@@ -19,6 +29,24 @@ dependencies {
     
     implementation("org.json:json:20090211")
     compileOnly("org.json:json:20090211")
+
+    // // https://mvnrepository.com/artifact/org.jogamp.joal/joal-main
+    // implementation("org.jogamp.joal:joal-main:2.5.0")
+    // compileOnly("org.jogamp.joal:joal-main:2.5.0")
+
+    // // https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen-rt-main
+    // implementation("org.jogamp.gluegen:gluegen-rt-main:2.5.0")
+    // compileOnly("org.jogamp.gluegen:gluegen-rt-main:2.5.0")
+
+    // implementation("org.urish.openal:java-openal:1.0.0")
+    // compileOnly("org.urish.openal:java-openal:1.0.0")
+
+    implementation(files("lib/java-openal-1.1.0-SNAPSHOT.jar"));
+    compileOnly(files("lib/java-openal-1.1.0-SNAPSHOT.jar"));
+
+    // https://mvnrepository.com/artifact/net.java.dev.jna/jna
+    implementation("net.java.dev.jna:jna:3.4.0")
+    compileOnly("net.java.dev.jna:jna:3.4.0")
 }
 
 tasks.withType(JavaCompile).configureEach {

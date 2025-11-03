@@ -57,7 +57,9 @@ public class Config {
 
     public Color TEXT_COLOR = new Color(0.75f, 0.75f, 0.75f);
 
-    public int AUDIO_BUFFER_SIZE = 4096;
+    public String OUTPUT_DEVICE = "VIRTUAL_SRC";
+    public int AUDIO_SAMPLE_RATE = 22050;
+    public int AUDIO_CHANNELS = 1;
 
     public Config() {
         WORD_REPLACEMENTS.put("tts", "text to speech");
