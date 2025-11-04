@@ -7,7 +7,7 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
-import org.loveroo.sillytts.Main;
+import org.loveroo.sillytts.config.Config;
 import org.urish.openal.Device;
 import org.urish.openal.OpenAL;
 import org.urish.openal.jna.ALFactory;
@@ -20,7 +20,9 @@ public class AudioSystem {
     public static void init() {
         try {
             factory = new ALFactory();
-            openal = new OpenAL(factory, Main.getConfig().OUTPUT_DEVICE);
+
+            registerOpenAL(Config.OUTPUT_DEVICE.get());
+            Config.OUTPUT_DEVICE.registerChangeAction(AudioSystem::registerOpenAL);
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -28,7 +30,22 @@ public class AudioSystem {
     }
 
     public static void shutdown() {
-        openal.close();
+        if(openal != null) {
+            openal.close();
+
+            openal = null;
+        }
+    }
+
+    private static void registerOpenAL(String device) {
+        shutdown();
+
+        try {
+            openal = new OpenAL(factory, device);
+        }
+        catch(Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static List<String> getAudioDevices() {
@@ -58,18 +75,27 @@ public class AudioSystem {
 
     static class AudioThread extends Thread {
 
+        private static AudioFormat format;
         private final byte[] data;
 
         public AudioThread(byte[] data) {
             this.data = data;
+
+            loadFormat();
+
+            Config.AUDIO_SAMPLE_RATE.registerChangeAction((channels) -> { loadFormat(); });
+            Config.AUDIO_CHANNELS.registerChangeAction((channels) -> { loadFormat(); });
+        }
+
+        private static void loadFormat() {
+            format = new AudioFormat(Config.AUDIO_SAMPLE_RATE.get(), 16, Config.AUDIO_CHANNELS.get(), true, false);
         }
 
         @Override
         public void run() {
             try {
-                var format = new AudioFormat(Main.getConfig().AUDIO_SAMPLE_RATE, 16, Main.getConfig().AUDIO_CHANNELS, true, false);
-
                 var stream = new ByteArrayInputStream(data);
+                
                 var source = openal.createSource(new AudioInputStream(stream, format, data.length));
                 source.play();
             }

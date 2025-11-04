@@ -7,15 +7,18 @@ import java.util.List;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
+import org.loveroo.sillytts.config.Config.ConfigOption;
 
 public class KeyBinding {
 
     private final HashMap<Integer, KeyState> keys = new HashMap<>();
     private final KeybindEvent event;
 
-    public KeyBinding(KeybindEvent event, List<Integer> keys) {
+    public KeyBinding(KeybindEvent event, ConfigOption<List<Integer>> keys) {
         this.event = event;
-        loadKeys(keys);
+
+        loadKeys(keys.get());
+        keys.registerChangeAction(this::loadKeys);
     }
     
     public void onKeyPress(int keyCode) {

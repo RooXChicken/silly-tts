@@ -4,121 +4,107 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.json.JSONObject;
-import org.loveroo.sillytts.config.mods.ColorModifier;
-import org.loveroo.sillytts.config.mods.DefaultModifier;
-import org.loveroo.sillytts.config.mods.EnumModifier;
-import org.loveroo.sillytts.config.mods.HashMapModifier;
-import org.loveroo.sillytts.config.mods.KeybindModifier;
-import org.loveroo.sillytts.config.mods.ListModifier;
-import org.loveroo.sillytts.keybind.KeyBinding;
+import org.loveroo.sillytts.config.custom.ColorOption;
+import org.loveroo.sillytts.config.custom.HashMapOption;
+import org.loveroo.sillytts.config.custom.ListOption;
 
 public class Config {
 
     private static final String CONFIG_PATH = "config.json";
+    private static final HashMap<ConfigElement, ConfigOption<?>> CONFIGS = new HashMap<>();
 
-    private static final HashMap<Class<?>, FieldModifier> FIELD_MODS = new HashMap<>();
-    private static final FieldModifier DEFAULT_MOD = new DefaultModifier();
+    public static final ConfigOption<String> WINDOW_NAME = new ConfigOption<>(ConfigElement.WINDOW_NAME, "tts :3");
+
+    public static final ConfigOption<Integer> FONT_SIZE = new ConfigOption<>(ConfigElement.FONT_SIZE, 16);
+
+    public static final ConfigOption<HashMap<String, String>>
+        WORD_REPLACEMENTS = new HashMapOption<>(ConfigElement.WORD_REPLACEMENTS, new HashMap<>()),
+        CONST_REPLACEMENTS = new HashMapOption<>(ConfigElement.CONST_REPLACEMENTS, new HashMap<>());
+
+    public static final ConfigOption<String>
+        PIPER_PATH = new ConfigOption<>(ConfigElement.PIPER_PATH, "/home/roo/bin/piper/piper"),
+        VOICE_MODEL = new ConfigOption<>(ConfigElement.VOICE_MODEL, "/home/roo/tts/en_US-libritts_r-medium.onnx");
+
+    public static final ConfigOption<List<Integer>>
+        SEND_TTS_KEYBIND = new ListOption<>(ConfigElement.SEND_TTS_KEYBIND, List.of(KeyEvent.VK_SHIFT, KeyEvent.VK_ENTER)),
+        MINIMIZE_TTS_KEYBIND = new ListOption<>(ConfigElement.MINIMIZE_TTS_KEYBIND, List.of(KeyEvent.VK_ESCAPE)),
+        CLOSE_TTS_KEYBIND = new ListOption<>(ConfigElement.CLOSE_TTS_KEYBIND, List.of(KeyEvent.VK_ALT, KeyEvent.VK_F4)),
+        OPEN_TTS_WINDOW_KEYBIND = new ListOption<>(ConfigElement.OPEN_TTS_WINDOW_KEYBIND, List.of(125, NativeKeyEvent.VC_F9));
+
+    public static final ConfigOption<Color>
+        CARET_COLOR = new ColorOption(ConfigElement.CARET_COLOR, new Color(1.0f, 0.46f, 0.82f)),
+        SELECTION_COLOR = new ColorOption(ConfigElement.SELECTION_COLOR, new Color(1.0f, 0.46f, 0.82f)),
+        OUTLINE_COLOR = new ColorOption(ConfigElement.OUTLINE_COLOR, new Color(1.0f, 0.46f, 0.82f)),
+        TEXT_COLOR = new ColorOption(ConfigElement.TEXT_COLOR, new Color(0.75f, 0.75f, 0.75f));
+
+
+    public static final ConfigOption<String> OUTPUT_DEVICE = new ConfigOption<>(ConfigElement.OUTPUT_DEVICE, "VIRTUAL_SRC");
+    public static final ConfigOption<Integer> AUDIO_SAMPLE_RATE = new ConfigOption<>(ConfigElement.AUDIO_SAMPLE_RATE, 22050);
+    public static final ConfigOption<Integer> AUDIO_CHANNELS = new ConfigOption<>(ConfigElement.AUDIO_CHANNELS, 1);
 
     static {
-        FIELD_MODS.put(Enum.class, new EnumModifier());
-        FIELD_MODS.put(Color.class, new ColorModifier());
-        FIELD_MODS.put(KeyBinding.class, new KeybindModifier());
-        FIELD_MODS.put(List.class, new ListModifier());
-        FIELD_MODS.put(HashMap.class, new HashMapModifier());
+        WORD_REPLACEMENTS.getDefaultValue().put("tts", "text to speech");
+        WORD_REPLACEMENTS.getDefaultValue().put("psychis", "psy kiss");
+        WORD_REPLACEMENTS.getDefaultValue().put("nvm", "nevermind");
+        WORD_REPLACEMENTS.getDefaultValue().put("wdym", "what do you mean");
+        WORD_REPLACEMENTS.getDefaultValue().put("rooxchicken", "roo ecks chicken");
+        WORD_REPLACEMENTS.getDefaultValue().put("omg", "oh my god");
+        WORD_REPLACEMENTS.getDefaultValue().put("omgg", "oh my golly gosh");
+        WORD_REPLACEMENTS.getDefaultValue().put("omggg", "oh my good golly gosh");
+        WORD_REPLACEMENTS.getDefaultValue().put("smp", "ess em pee");
+        WORD_REPLACEMENTS.getDefaultValue().put("mc", "minecraft");
+        WORD_REPLACEMENTS.getDefaultValue().put(":c", "sad");
+        WORD_REPLACEMENTS.getDefaultValue().put(":\\(", "sad");
+        WORD_REPLACEMENTS.getDefaultValue().put(":\\)", "happy");
+        WORD_REPLACEMENTS.getDefaultValue().put(":\\>", "happy");
+        WORD_REPLACEMENTS.getDefaultValue().put(":D", "happy");
+        WORD_REPLACEMENTS.getDefaultValue().put(":P", "silly");
+        WORD_REPLACEMENTS.getDefaultValue().put(":3", "silly");
+        WORD_REPLACEMENTS.getDefaultValue().put("tts", "text to speech");
+        WORD_REPLACEMENTS.getDefaultValue().put("btw", "by the way");
+        WORD_REPLACEMENTS.getDefaultValue().put("ikr", "i know right");
+        WORD_REPLACEMENTS.getDefaultValue().put("smth", "something");
+        WORD_REPLACEMENTS.getDefaultValue().put("kms", "kay emm ess");
+        WORD_REPLACEMENTS.getDefaultValue().put("fr", "for real");
+        WORD_REPLACEMENTS.getDefaultValue().put("rn", "right now");
+
+        CONST_REPLACEMENTS.getDefaultValue().put("\\_", " underscore ");
+        CONST_REPLACEMENTS.getDefaultValue().put("\\-", " dash ");
+        CONST_REPLACEMENTS.getDefaultValue().put("\\/", " slash ");
     }
 
-    public String WINDOW_NAME = "tts :3";
-
-    public int FONT_SIZE = 16;
-
-    public HashMap<String, String> WORD_REPLACEMENTS = new HashMap<>();
-    public HashMap<String, String> CONST_REPLACEMENTS = new HashMap<>();
-
-    public String PIPER_PATH = "/home/roo/bin/piper/piper";
-    public String VOICE_MODEL = "/home/roo/tts/en_US-libritts_r-medium.onnx";
-
-    public List<Integer> SEND_TTS_KEYBIND = List.of(KeyEvent.VK_SHIFT, KeyEvent.VK_ENTER);
-    public List<Integer> MINIMIZE_TTS_KEYBIND = List.of(KeyEvent.VK_ESCAPE);
-    public List<Integer> CLOSE_TTS_KEYBIND = List.of(KeyEvent.VK_ALT, KeyEvent.VK_F4);
-    public List<Integer> OPEN_TTS_WINDOW_KEYBIND = List.of(125, NativeKeyEvent.VC_F9);
-
-    public Color CARET_COLOR = new Color(1.0f, 0.46f, 0.82f);
-    public Color SELECTION_COLOR = new Color(1.0f, 0.46f, 0.82f);
-    public Color OUTLINE_COLOR = new Color(1.0f, 0.46f, 0.82f);
-
-    public Color TEXT_COLOR = new Color(0.75f, 0.75f, 0.75f);
-
-    public String OUTPUT_DEVICE = "VIRTUAL_SRC";
-    public int AUDIO_SAMPLE_RATE = 22050;
-    public int AUDIO_CHANNELS = 1;
-
-    public Config() {
-        WORD_REPLACEMENTS.put("tts", "text to speech");
-        WORD_REPLACEMENTS.put("psychis", "psy kiss");
-        WORD_REPLACEMENTS.put("nvm", "nevermind");
-        WORD_REPLACEMENTS.put("wdym", "what do you mean");
-        WORD_REPLACEMENTS.put("rooxchicken", "roo ecks chicken");
-        WORD_REPLACEMENTS.put("omg", "oh my god");
-        WORD_REPLACEMENTS.put("omgg", "oh my golly gosh");
-        WORD_REPLACEMENTS.put("omggg", "oh my good golly gosh");
-        WORD_REPLACEMENTS.put("smp", "ess em pee");
-        WORD_REPLACEMENTS.put("mc", "minecraft");
-        WORD_REPLACEMENTS.put(":c", "sad");
-        WORD_REPLACEMENTS.put(":\\(", "sad");
-        WORD_REPLACEMENTS.put(":\\)", "happy");
-        WORD_REPLACEMENTS.put(":\\>", "happy");
-        WORD_REPLACEMENTS.put(":D", "happy");
-        WORD_REPLACEMENTS.put(":P", "silly");
-        WORD_REPLACEMENTS.put(":3", "silly");
-        WORD_REPLACEMENTS.put("tts", "text to speech");
-        WORD_REPLACEMENTS.put("btw", "by the way");
-        WORD_REPLACEMENTS.put("ikr", "i know right");
-        WORD_REPLACEMENTS.put("smth", "something");
-        WORD_REPLACEMENTS.put("kms", "kay emm ess");
-        WORD_REPLACEMENTS.put("fr", "for real");
-        WORD_REPLACEMENTS.put("rn", "right now");
-
-        CONST_REPLACEMENTS.put("\\_", " underscore ");
-        CONST_REPLACEMENTS.put("\\-", " dash ");
-        CONST_REPLACEMENTS.put("\\/", " slash ");
-    }
-
-    public void load() {
+    public static void load() {
         try {
-            var config = new File(CONFIG_PATH);
+            var configFile = new File(CONFIG_PATH);
             
             var data = "{}";
-            if(!config.exists()) {
+            if(!configFile.exists()) {
                 save();
             }
 
-            if(config.exists()) {
+            if(configFile.exists()) {
                 data = Files.readString(Paths.get(CONFIG_PATH));
             }
     
             var json = new JSONObject(data);
     
-            var clazz = this.getClass();
-            for(var field : clazz.getDeclaredFields()) {
-                if(Modifier.isStatic(field.getModifiers()) || !field.canAccess(this)) {
+            for(var option : ConfigElement.values()) {
+                var config = CONFIGS.get(option);
+                var value = json.opt(option.name().toLowerCase());
+
+                if(value == null) {
                     continue;
                 }
-    
-                var value = json.opt(field.getName().toLowerCase());
-                if(value == null) {
-                    value = getValueFromField(field);
-                }
-    
-                loadValueFromField(field, value);
+
+                config.load(value);
             }
         }
         catch(Exception e) {
@@ -126,18 +112,15 @@ public class Config {
         }
     }
 
-    public void save() {
+    public static void save() {
         try {
             var json = new JSONObject();
     
-            var clazz = this.getClass();
-            for(var field : clazz.getDeclaredFields()) {
-                if(Modifier.isStatic(field.getModifiers()) || !field.canAccess(this)) {
-                    continue;
-                }
-    
-                var value = getValueFromField(field);
-                json.put(field.getName().toLowerCase(), value);
+            for(var option : ConfigElement.values()) {
+                var config = CONFIGS.get(option);
+                var value = config.save();
+
+                json.put(option.name().toLowerCase(), value);
             }
     
             var config = new File(CONFIG_PATH);
@@ -150,18 +133,84 @@ public class Config {
             e.printStackTrace();
         }
     }
+    
+    public static class ConfigOption<T> {
+        
+        private final ConfigElement configElement;
+        private final T defaultValue;
+        private T value;
 
-    private void loadValueFromField(Field field, Object value) throws Exception {
-        FIELD_MODS.getOrDefault(field.getType(), DEFAULT_MOD).load(field, this, value);
+        private HashSet<OnChange<T>> changeActions = new HashSet<>();
+
+        public ConfigOption(ConfigElement configElement, T defaultValue) {
+            this.configElement = configElement;
+            this.defaultValue = defaultValue;
+
+            this.value = defaultValue;
+            register();
+        }
+
+        protected void register() {
+            CONFIGS.put(configElement, this);
+        }
+
+        public ConfigElement getConfigElement() {
+            return configElement;
+        }
+
+        public T getDefaultValue() {
+            return defaultValue;
+        }
+
+        public T get() {
+            return value;
+        }
+
+        public void registerChangeAction(OnChange<T> changeAction) {
+            changeActions.add(changeAction);
+        }
+
+        @SuppressWarnings("unchecked")
+        public void set(Object value) {
+            this.value = (T) value;
+        }
+
+        public void load(Object value) {
+            set(value);
+
+            for(var action : changeActions) {
+                action.onChange(get());
+            }
+        }
+
+        public Object save() {
+            return value;
+        }
+
+        public static interface OnChange<T> {
+
+            public void onChange(T value);
+        }
     }
 
-    private Object getValueFromField(Field field) throws Exception {
-        return FIELD_MODS.getOrDefault(field.getType(), DEFAULT_MOD).save(field, this);
-    }
+    public static enum ConfigElement {
 
-    public static interface FieldModifier {
-
-        void load(Field field, Config instance, Object value) throws Exception;
-        Object save(Field field, Config instance) throws Exception;
+        WINDOW_NAME,
+        FONT_SIZE,
+        WORD_REPLACEMENTS,
+        CONST_REPLACEMENTS,
+        PIPER_PATH,
+        VOICE_MODEL,
+        SEND_TTS_KEYBIND,
+        MINIMIZE_TTS_KEYBIND,
+        CLOSE_TTS_KEYBIND,
+        OPEN_TTS_WINDOW_KEYBIND,
+        CARET_COLOR,
+        SELECTION_COLOR,
+        OUTLINE_COLOR,
+        TEXT_COLOR,
+        OUTPUT_DEVICE,
+        AUDIO_SAMPLE_RATE,
+        AUDIO_CHANNELS,
     }
 }

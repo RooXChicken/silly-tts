@@ -11,12 +11,14 @@ import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.border.Border;
 
+import org.loveroo.sillytts.config.Config.ConfigOption;
+
 public class RoundedBorder implements Border {
 
     private int radius;
-    private Color color;
+    private ConfigOption<Color> color;
 
-    public RoundedBorder(int radius, Color color) {
+    public RoundedBorder(int radius, ConfigOption<Color> color) {
         this.radius = radius;
         this.color = color;
     }
@@ -26,7 +28,7 @@ public class RoundedBorder implements Border {
     }
 
     public Color getColor() {
-        return color;
+        return color.get();
     }
 
     @Override

@@ -4,13 +4,14 @@ import java.awt.event.KeyListener;
 
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.loveroo.sillytts.Main;
+import org.loveroo.sillytts.config.Config;
 
 public enum Keybind {
     
-    SEND_TTS_KEYBIND(new KeyBinding(() -> { Main.getTTSWindow().sendTTS(); }, Main.getConfig().SEND_TTS_KEYBIND)),
-    MINIMIZE_TTS_KEYBIND(new KeyBinding(() -> { Main.setEnabled(false); }, Main.getConfig().MINIMIZE_TTS_KEYBIND)),
-    CLOSE_TTS_KEYBIND(new KeyBinding(() -> { System.exit(0); }, Main.getConfig().CLOSE_TTS_KEYBIND)),
-    OPEN_TTS_WINDOW_KEYBIND(new KeyBinding(() -> { Main.setEnabled(true); }, Main.getConfig().OPEN_TTS_WINDOW_KEYBIND));
+    SEND_TTS_KEYBIND(new KeyBinding(() -> { Main.getTTSWindow().sendTTS(); }, Config.SEND_TTS_KEYBIND)),
+    MINIMIZE_TTS_KEYBIND(new KeyBinding(() -> { Main.setEnabled(false); }, Config.MINIMIZE_TTS_KEYBIND)),
+    CLOSE_TTS_KEYBIND(new KeyBinding(() -> { System.exit(0); }, Config.CLOSE_TTS_KEYBIND)),
+    OPEN_TTS_WINDOW_KEYBIND(new KeyBinding(() -> { Main.setEnabled(true); }, Config.OPEN_TTS_WINDOW_KEYBIND));
 
     private final KeyBinding keyBinding;
 

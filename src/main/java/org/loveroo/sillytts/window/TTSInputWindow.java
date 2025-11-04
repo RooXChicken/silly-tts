@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.StyleConstants;
 
 import org.loveroo.sillytts.Main;
+import org.loveroo.sillytts.config.Config;
 import org.loveroo.sillytts.keybind.Keybind;
 import org.loveroo.sillytts.util.TTSSystem;
 import org.loveroo.sillytts.window.gui.RoundedBorder;
@@ -23,7 +24,8 @@ public class TTSInputWindow extends JFrame {
     private final JTextPane textBox;
     
     public TTSInputWindow() {
-        setTitle(Main.getConfig().WINDOW_NAME);
+        setTitle(Config.WINDOW_NAME.get());
+        Config.WINDOW_NAME.registerChangeAction(this::setTitle);
 
         var icon = new ImageIcon(Main.class.getResource("/icon.png"));
         setIconImage(icon.getImage());
@@ -33,18 +35,29 @@ public class TTSInputWindow extends JFrame {
 
         textBox = new JTextPane();
 
-        textBox.setBorder(new CompoundBorder(new EmptyBorder(2, 2, 2, 2), new RoundedBorder(15, Main.getConfig().OUTLINE_COLOR)));
+        textBox.setBorder(new CompoundBorder(new EmptyBorder(2, 2, 2, 2), new RoundedBorder(15, Config.OUTLINE_COLOR)));
         textBox.setBackground(new Color(20, 20, 20));
 
         var textStyle = textBox.addStyle("text_color", null);
-        StyleConstants.setForeground(textStyle, Main.getConfig().TEXT_COLOR);
-        StyleConstants.setFontSize(textStyle, Main.getConfig().FONT_SIZE);
+        StyleConstants.setForeground(textStyle, Config.TEXT_COLOR.get());
+        StyleConstants.setFontSize(textStyle, Config.FONT_SIZE.get());
         StyleConstants.setFontFamily(textStyle, Main.getFont().getFontName());
+
+        Config.TEXT_COLOR.registerChangeAction((color) -> {
+            StyleConstants.setForeground(textStyle, color);
+        });
+
+        Config.FONT_SIZE.registerChangeAction((color) -> {
+            StyleConstants.setFontSize(textStyle, color);
+        });
 
         textBox.setLogicalStyle(textStyle);
 
-        textBox.setSelectionColor(Main.getConfig().SELECTION_COLOR);
-        textBox.setCaretColor(Main.getConfig().CARET_COLOR);
+        textBox.setSelectionColor(Config.SELECTION_COLOR.get());
+        textBox.setCaretColor(Config.CARET_COLOR.get());
+
+        Config.SELECTION_COLOR.registerChangeAction(textBox::setSelectionColor);
+        Config.SELECTION_COLOR.registerChangeAction(textBox::setCaretColor);
 
         textBox.addKeyListener(Keybind.SEND_TTS_KEYBIND.getATWListener());
         textBox.addKeyListener(Keybind.MINIMIZE_TTS_KEYBIND.getATWListener());

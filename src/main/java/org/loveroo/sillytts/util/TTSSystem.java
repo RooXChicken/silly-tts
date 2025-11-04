@@ -3,7 +3,7 @@ package org.loveroo.sillytts.util;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.List;
 
-import org.loveroo.sillytts.Main;
+import org.loveroo.sillytts.config.Config;
 
 public class TTSSystem {
     
@@ -27,14 +27,14 @@ public class TTSSystem {
     private static String replaceText(String text) {
         var newText = " " + text.toLowerCase() + " ";
 
-        for(var entry : Main.getConfig().WORD_REPLACEMENTS.entrySet()) {
+        for(var entry : Config.WORD_REPLACEMENTS.get().entrySet()) {
             var key = String.format("\\s%s\\s", entry.getKey());
             var word = String.format(" %s ", entry.getValue());
 
             newText = newText.replaceAll(key, word);
         }
 
-        for(var entry : Main.getConfig().CONST_REPLACEMENTS.entrySet()) {
+        for(var entry : Config.CONST_REPLACEMENTS.get().entrySet()) {
             newText = newText.replaceAll(entry.getKey(), entry.getValue());
         }
 
@@ -59,7 +59,7 @@ public class TTSSystem {
                     new ProcessBuilder(new String[] { "echo", input })
                         .inheritIO()
                         .redirectOutput(Redirect.PIPE),
-                    new ProcessBuilder(new String[] { Main.getConfig().PIPER_PATH, "--model", Main.getConfig().VOICE_MODEL, "--output-raw" })
+                    new ProcessBuilder(new String[] { Config.PIPER_PATH.get(), "--model", Config.VOICE_MODEL.get(), "--output-raw" })
                         .redirectError(Redirect.DISCARD)
                 ));
 

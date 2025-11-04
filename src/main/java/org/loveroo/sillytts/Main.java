@@ -16,8 +16,6 @@ import org.loveroo.sillytts.window.TTSInputWindow;
 
 public class Main {
 
-    private static final Config CONFIG = new Config();
-
     private static Font font;
     private static TTSInputWindow ttsInputWindow;
 
@@ -29,22 +27,21 @@ public class Main {
         try {
             var fontStream = Main.class.getResourceAsStream("/CascadiaMono-Bold.ttf");
 
-            if(fontStream != null) {
-                font = Font.createFonts(fontStream)[0];
-                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
-            }
-            else {
+            if(fontStream == null) {
                 System.out.println("Failed to load font! Stream is null!");
                 return;
             }
+
+            font = Font.createFonts(fontStream)[0];
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
         }
         catch(Exception e) {
             System.out.println("Failed to load font! " + e);
             return;
         }
 
-        CONFIG.load();
-        CONFIG.save();
+        Config.load();
+        Config.save();
 
         UIManager.put("Caret.width", 2);
 
@@ -75,14 +72,6 @@ public class Main {
         else {
             ttsInputWindow.minimize();
         }
-    }
-
-    /**
-     * Gets the app config
-     * @return The config
-     */
-    public static Config getConfig() {
-        return CONFIG;
     }
 
     /**
