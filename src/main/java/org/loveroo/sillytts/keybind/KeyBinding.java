@@ -21,7 +21,7 @@ public class KeyBinding {
         keys.registerChangeAction(this::loadKeys);
     }
     
-    public void onKeyPress(int keyCode) {
+    protected void onKeyPress(int keyCode) {
         if(!keys.containsKey(keyCode)) {
             return;
         }
@@ -34,7 +34,7 @@ public class KeyBinding {
         }
     }
 
-    public void onKeyRelease(int keyCode) {
+    protected void onKeyRelease(int keyCode) {
         if(!keys.containsKey(keyCode)) {
             return;
         }

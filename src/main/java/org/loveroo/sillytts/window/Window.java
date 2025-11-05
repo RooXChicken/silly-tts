@@ -2,7 +2,8 @@ package org.loveroo.sillytts.window;
 
 public enum Window {
     
-    TTS_INPUT(460, 160);
+    TTS_INPUT(460, 160),
+    SETTINGS(640, 480);
 
     private final int width;
     private final int height;

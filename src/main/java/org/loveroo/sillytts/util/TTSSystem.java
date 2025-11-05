@@ -52,14 +52,15 @@ public class TTSSystem {
 
         @Override
         public void run() {
+            var piperArgs = String.format(" --model %s --output-raw", Config.VOICE_MODEL.get().trim());
+
             try {
                 // pipe echo into piper for file-less playback
-
                 var processes = ProcessBuilder.startPipeline(List.of(
-                    new ProcessBuilder(new String[] { "echo", input })
+                    new ProcessBuilder(getOsEchoCommand(input))
                         .inheritIO()
                         .redirectOutput(Redirect.PIPE),
-                    new ProcessBuilder(new String[] { Config.PIPER_PATH.get(), "--model", Config.VOICE_MODEL.get(), "--output-raw" })
+                    new ProcessBuilder((Config.PIPER_COMMAND.get().trim() + piperArgs).split(" "))
                         .redirectError(Redirect.DISCARD)
                 ));
 
@@ -69,6 +70,15 @@ public class TTSSystem {
             catch(Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private static String[] getOsEchoCommand(String input) {
+            return switch(OSUtil.getOs()) {
+                case WINDOWS -> new String[] { "cmd.exe", "/C", "echo", input };
+                case LINUX -> new String[] { "echo", input };
+
+                default -> new String[0];
+            };
         }
     }
 }

@@ -25,21 +25,26 @@ public class Config {
 
     public static final ConfigOption<Integer> FONT_SIZE = new ConfigOption<>(ConfigElement.FONT_SIZE, 16);
 
+    public static final ConfigOption<Boolean> MINIMIZE_ON_X = new ConfigOption<>(ConfigElement.MINIMIZE_ON_X, true);
+    public static final ConfigOption<Integer> TTS_WINDOW_OPEN_DELAY = new ConfigOption<>(ConfigElement.TTS_WINDOW_OPEN_DELAY, 10);
+
     public static final ConfigOption<HashMap<String, String>>
         WORD_REPLACEMENTS = new HashMapOption<>(ConfigElement.WORD_REPLACEMENTS, new HashMap<>()),
         CONST_REPLACEMENTS = new HashMapOption<>(ConfigElement.CONST_REPLACEMENTS, new HashMap<>());
 
     public static final ConfigOption<String>
-        PIPER_PATH = new ConfigOption<>(ConfigElement.PIPER_PATH, "/home/roo/bin/piper/piper"),
-        VOICE_MODEL = new ConfigOption<>(ConfigElement.VOICE_MODEL, "/home/roo/tts/en_US-libritts_r-medium.onnx");
+        PIPER_COMMAND = new ConfigOption<>(ConfigElement.PIPER_COMMAND, "python3 -m piper"),
+        VOICE_MODEL = new ConfigOption<>(ConfigElement.VOICE_MODEL, "");
 
     public static final ConfigOption<List<Integer>>
         SEND_TTS_KEYBIND = new ListOption<>(ConfigElement.SEND_TTS_KEYBIND, List.of(KeyEvent.VK_SHIFT, KeyEvent.VK_ENTER)),
         MINIMIZE_TTS_KEYBIND = new ListOption<>(ConfigElement.MINIMIZE_TTS_KEYBIND, List.of(KeyEvent.VK_ESCAPE)),
         CLOSE_TTS_KEYBIND = new ListOption<>(ConfigElement.CLOSE_TTS_KEYBIND, List.of(KeyEvent.VK_ALT, KeyEvent.VK_F4)),
-        OPEN_TTS_WINDOW_KEYBIND = new ListOption<>(ConfigElement.OPEN_TTS_WINDOW_KEYBIND, List.of(125, NativeKeyEvent.VC_F9));
+        OPEN_TTS_WINDOW_KEYBIND = new ListOption<>(ConfigElement.OPEN_TTS_WINDOW_KEYBIND, List.of(125, NativeKeyEvent.VC_F9)),
+        OPEN_SETTINGS = new ListOption<>(ConfigElement.OPEN_SETTINGS, List.of(KeyEvent.VK_CONTROL, KeyEvent.VK_COMMA));
 
     public static final ConfigOption<Color>
+        BACKGROUND_COLOR = new ColorOption(ConfigElement.BACKGROUND_COLOR, new Color(20, 20, 20)),
         CARET_COLOR = new ColorOption(ConfigElement.CARET_COLOR, new Color(1.0f, 0.46f, 0.82f)),
         SELECTION_COLOR = new ColorOption(ConfigElement.SELECTION_COLOR, new Color(1.0f, 0.46f, 0.82f)),
         OUTLINE_COLOR = new ColorOption(ConfigElement.OUTLINE_COLOR, new Color(1.0f, 0.46f, 0.82f)),
@@ -75,6 +80,8 @@ public class Config {
         WORD_REPLACEMENTS.getDefaultValue().put("kms", "kay emm ess");
         WORD_REPLACEMENTS.getDefaultValue().put("fr", "for real");
         WORD_REPLACEMENTS.getDefaultValue().put("rn", "right now");
+        WORD_REPLACEMENTS.getDefaultValue().put("u", "you");
+        WORD_REPLACEMENTS.getDefaultValue().put("ur", "your");
 
         CONST_REPLACEMENTS.getDefaultValue().put("\\_", " underscore ");
         CONST_REPLACEMENTS.getDefaultValue().put("\\-", " dash ");
@@ -173,18 +180,20 @@ public class Config {
         @SuppressWarnings("unchecked")
         public void set(Object value) {
             this.value = (T) value;
-        }
-
-        public void load(Object value) {
-            set(value);
 
             for(var action : changeActions) {
                 action.onChange(get());
             }
+
+            Config.save();
+        }
+
+        public void load(Object value) {
+            set(value);
         }
 
         public Object save() {
-            return value;
+            return get();
         }
 
         public static interface OnChange<T> {
@@ -195,22 +204,36 @@ public class Config {
 
     public static enum ConfigElement {
 
-        WINDOW_NAME,
-        FONT_SIZE,
-        WORD_REPLACEMENTS,
-        CONST_REPLACEMENTS,
-        PIPER_PATH,
-        VOICE_MODEL,
-        SEND_TTS_KEYBIND,
-        MINIMIZE_TTS_KEYBIND,
-        CLOSE_TTS_KEYBIND,
-        OPEN_TTS_WINDOW_KEYBIND,
-        CARET_COLOR,
-        SELECTION_COLOR,
-        OUTLINE_COLOR,
-        TEXT_COLOR,
-        OUTPUT_DEVICE,
-        AUDIO_SAMPLE_RATE,
-        AUDIO_CHANNELS,
+        WINDOW_NAME("Window Name"),
+        FONT_SIZE("Font Size"),
+        MINIMIZE_ON_X("Minimize on Close"),
+        TTS_WINDOW_OPEN_DELAY("Window Open Lock Delay"),
+        WORD_REPLACEMENTS("Word Replacements"),
+        CONST_REPLACEMENTS("Constant Replacements"),
+        PIPER_COMMAND("Piper Command"),
+        VOICE_MODEL("Voice Model Path"),
+        SEND_TTS_KEYBIND("Send TTS Keybind"),
+        MINIMIZE_TTS_KEYBIND("Minimize Keybind"),
+        CLOSE_TTS_KEYBIND("Quit Keybind"),
+        OPEN_TTS_WINDOW_KEYBIND("Open TTS Keybind"),
+        OPEN_SETTINGS("Open Settings Keybind"),
+        BACKGROUND_COLOR("Background Color"),
+        CARET_COLOR("Caret Color"),
+        SELECTION_COLOR("Selection Color"),
+        OUTLINE_COLOR("Outline Color"),
+        TEXT_COLOR("Text Color"),
+        OUTPUT_DEVICE("Output Device"),
+        AUDIO_SAMPLE_RATE("Sample Rate"),
+        AUDIO_CHANNELS("Channel Count");
+
+        private final String shownName;
+
+        ConfigElement(String shownName) {
+            this.shownName = shownName;
+        }
+
+        public String getShownName() {
+            return shownName;
+        }
     }
 }
