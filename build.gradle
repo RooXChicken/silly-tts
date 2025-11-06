@@ -47,6 +47,9 @@ dependencies {
     // https://mvnrepository.com/artifact/net.java.dev.jna/jna
     implementation("net.java.dev.jna:jna:3.4.0")
     compileOnly("net.java.dev.jna:jna:3.4.0")
+
+    implementation("org.drjekyll:colorpicker:2.0.2-SNAPSHOT")
+    compileOnly("org.drjekyll:colorpicker:2.0.2-SNAPSHOT")
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -56,5 +59,6 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(Jar).configureEach {
     manifest {
         attributes["Main-Class"] = "org.loveroo.sillytts.Main"
+        attributes["Add-Opens"] = "java.desktop/java.awt"
     }
 }

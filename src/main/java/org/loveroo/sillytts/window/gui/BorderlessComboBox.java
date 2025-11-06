@@ -40,7 +40,7 @@ public class BorderlessComboBox extends BasicComboBoxUI {
                 list.setSelectionForeground(Config.TEXT_COLOR.get());
             }
             else {
-                list.setSelectionBackground(Config.SELECTION_COLOR.get());
+                list.setSelectionBackground(Config.OUTLINE_COLOR.get());
                 list.setSelectionForeground(Config.BACKGROUND_COLOR.get());
             }
 
@@ -48,6 +48,7 @@ public class BorderlessComboBox extends BasicComboBoxUI {
                 list.setBorder(UIManager.getBorder("TextPane.border"));
             }
 
+            // TODO: remove scroll bar (when not needed)
             // list.setSize(list.getPreferredSize());
 
             return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);

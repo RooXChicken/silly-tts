@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -147,7 +147,7 @@ public class Config {
         private final T defaultValue;
         private T value;
 
-        private HashSet<OnChange<T>> changeActions = new HashSet<>();
+        private ArrayList<OnChange<T>> changeActions = new ArrayList<>();
 
         public ConfigOption(ConfigElement configElement, T defaultValue) {
             this.configElement = configElement;
@@ -204,36 +204,42 @@ public class Config {
 
     public static enum ConfigElement {
 
-        WINDOW_NAME("Window Name"),
-        FONT_SIZE("Font Size"),
-        MINIMIZE_ON_X("Minimize on Close"),
-        TTS_WINDOW_OPEN_DELAY("Window Open Lock Delay"),
-        WORD_REPLACEMENTS("Word Replacements"),
-        CONST_REPLACEMENTS("Constant Replacements"),
-        PIPER_COMMAND("Piper Command"),
-        VOICE_MODEL("Voice Model Path"),
-        SEND_TTS_KEYBIND("Send TTS Keybind"),
-        MINIMIZE_TTS_KEYBIND("Minimize Keybind"),
-        CLOSE_TTS_KEYBIND("Quit Keybind"),
-        OPEN_TTS_WINDOW_KEYBIND("Open TTS Keybind"),
-        OPEN_SETTINGS("Open Settings Keybind"),
-        BACKGROUND_COLOR("Background Color"),
-        CARET_COLOR("Caret Color"),
-        SELECTION_COLOR("Selection Color"),
-        OUTLINE_COLOR("Outline Color"),
-        TEXT_COLOR("Text Color"),
-        OUTPUT_DEVICE("Output Device"),
-        AUDIO_SAMPLE_RATE("Sample Rate"),
-        AUDIO_CHANNELS("Channel Count");
+        WINDOW_NAME("Window Name", "Changes the name of the Main TTS Window"),
+        FONT_SIZE("Font Size", "Changes the sizing of the font"),
+        MINIMIZE_ON_X("Minimize on Close", "Makes the application stay open in the background when the X button is pressed (to close, press alt+f4)"),
+        TTS_WINDOW_OPEN_DELAY("Window Open Lock Delay", "Prevents text input for X milliseconds after opening the Main TTS Window"),
+        WORD_REPLACEMENTS("Word Replacements", "Replaces all elements with their corresponding words as long as it is separated by whitespace"),
+        CONST_REPLACEMENTS("Constant Replacements", "Replaces all elements with their corresponding values *always*"),
+        PIPER_COMMAND("Piper Command", "The command used to execute the Piper TTS"),
+        VOICE_MODEL("Voice Model Path", "The path to the voice model"),
+        SEND_TTS_KEYBIND("Send TTS Keybind", "Sends the TTS when this keybind is activated"),
+        MINIMIZE_TTS_KEYBIND("Minimize Keybind", "Minimizes the Main TTS Window when this keybind is activated"),
+        CLOSE_TTS_KEYBIND("Quit Keybind", "Quits Silly TTS when this keybind is activated"),
+        OPEN_TTS_WINDOW_KEYBIND("Open TTS Keybind", "Opens the Main TTS Window when this keybind is activated"),
+        OPEN_SETTINGS("Open Settings Keybind", "Opens the Settings Window when this keybind is activated"),
+        BACKGROUND_COLOR("Background Color", "The color of the background"),
+        CARET_COLOR("Caret Color", "The color of the text caret (|)"),
+        SELECTION_COLOR("Selection Color", "The color of the text selection"),
+        OUTLINE_COLOR("Outline Color", "The color of all rounded outlines"),
+        TEXT_COLOR("Text Color", "The color of the text"),
+        OUTPUT_DEVICE("Output Device", "The Audio Device the TTS uses for output"),
+        AUDIO_SAMPLE_RATE("Sample Rate", "The sample rate of the TTS model"),
+        AUDIO_CHANNELS("Channel Count", "The channel count of the TTS model");
 
         private final String shownName;
+        private final String description;
 
-        ConfigElement(String shownName) {
+        ConfigElement(String shownName, String description) {
             this.shownName = shownName;
+            this.description = description;
         }
 
         public String getShownName() {
             return shownName;
+        }
+
+        public String getDescription() {
+            return description;
         }
     }
 }

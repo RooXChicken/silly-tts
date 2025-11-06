@@ -1,5 +1,6 @@
 package org.loveroo.sillytts;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
@@ -15,7 +16,6 @@ import javax.swing.text.StyleConstants;
 
 import org.jnativehook.GlobalScreen;
 import org.loveroo.sillytts.config.Config;
-import org.loveroo.sillytts.config.Config.ConfigOption;
 import org.loveroo.sillytts.keybind.Keybind;
 import org.loveroo.sillytts.util.AudioSystem;
 import org.loveroo.sillytts.window.TTSInputWindow;
@@ -54,15 +54,7 @@ public class Main {
         Config.load();
         Config.save();
 
-        // javax.swing.UIManager.getDefaults().keySet()
-        //     .stream()
-        //     .map((it) -> it.toString())
-        //     .sorted()
-        //     .forEach((it) -> System.out.println(it));
-
         initTheme();
-        // UIManager.put("ComboBox.selectionBackground", new ColorUIResource(Config.SELECTION_COLOR.get()));
-        // UIManager.put("ComboBox.selectionBackground", new ColorUIResource(Config.SELECTION_COLOR.get()));
 
         ttsInputWindow = new TTSInputWindow();
         setEnabled(false);
@@ -80,45 +72,93 @@ public class Main {
         }
     }
 
+    private static void repaintAll() {
+        for(var frame : Frame.getFrames()) {
+            frame.repaint();
+        }
+    }
+
+    private static Color textColor;
+    private static Color caretColor;
+    private static Color selectionColor;
+    private static Color outlineColor;
+    private static Color backgroundColor;
+
     private static void initTheme() {
         UIManager.put("Caret.width", 2);
 
         final var border = new CompoundBorder(new EmptyBorder(2, 2, 2, 2), new RoundedBorder(15, Config.OUTLINE_COLOR));
 
+        textColor = Config.TEXT_COLOR.get();
+        caretColor = Config.CARET_COLOR.get();
+        selectionColor = Config.SELECTION_COLOR.get();
+        outlineColor = Config.OUTLINE_COLOR.get();
+        backgroundColor = Config.BACKGROUND_COLOR.get();
+
         UIManager.put("TextPane.border", border);
         UIManager.put("ListUI.border", border);
+        UIManager.put("ToolTip.border", border);
 
         UIManager.put("Label.font", getFont());
         UIManager.put("TextPane.font", getFont());
         UIManager.put("ComboBox.font", getFont());
+        UIManager.put("ToolTip.font", getFont());
+        UIManager.put("TabbedPane.font", getFont());
 
-        // UIManager.put("ComboBox.borderPaintsFocus", true);
+        UIManager.put("Label.foreground", textColor);
+        UIManager.put("TextPane.foreground", textColor);
+        UIManager.put("ComboBox.foreground", textColor);
+        UIManager.put("ToolTip.foreground", textColor);
+        UIManager.put("TabbedPane.foreground", textColor);
 
-        registerUpdater("Label.foreground", Config.TEXT_COLOR);
-        registerUpdater("TextPane.foreground", Config.TEXT_COLOR);
-        registerUpdater("ComboBox.foreground", Config.TEXT_COLOR);
+        UIManager.put("TextPane.caretForeground", caretColor);
 
-        registerUpdater("TextPane.caretForeground", Config.SELECTION_COLOR);
-        registerUpdater("TextPane.selectionBackground", Config.SELECTION_COLOR);
-        registerUpdater("ComboBox.selectionBackground", Config.SELECTION_COLOR);
-        registerUpdater("ComboBox.buttonHighlight", Config.SELECTION_COLOR);
-        registerUpdater("ComboBox.buttonShadow", Config.SELECTION_COLOR);
-        registerUpdater("ComboBox.buttonDarkShadow", Config.SELECTION_COLOR);
+        UIManager.put("ComboBox.selectionBackground", selectionColor);
         
-        registerUpdater("TextPane.background", Config.BACKGROUND_COLOR);
-        registerUpdater("TextPane.selectionForeground", Config.BACKGROUND_COLOR);
-        registerUpdater("Label.background", Config.BACKGROUND_COLOR);
-        registerUpdater("Panel.background", Config.BACKGROUND_COLOR);
-        registerUpdater("ComboBox.background", Config.BACKGROUND_COLOR);
-        registerUpdater("ComboBox.buttonBackground", Config.BACKGROUND_COLOR);
-    }
+        UIManager.put("ComboBox.buttonHighlight", outlineColor);
+        UIManager.put("ComboBox.buttonShadow", outlineColor);
+        UIManager.put("ComboBox.buttonDarkShadow", outlineColor);
+        UIManager.put("TabbedPane.borderHightlightColor", outlineColor);
+        UIManager.put("TabbedPane.selectHighlight", outlineColor);
+        UIManager.put("TabbedPane.selected", outlineColor);
+        UIManager.put("TabbedPane.light", outlineColor);
+        UIManager.put("TabbedPane.highlight", outlineColor);
+        UIManager.put("TabbedPane.shadow", outlineColor);
+        UIManager.put("TabbedPane.darkShadow", outlineColor);
+        UIManager.put("TabbedPane.focus", outlineColor);
+        UIManager.put("TextPane.selectionBackground", outlineColor);
+        
+        UIManager.put("TextPane.background", backgroundColor);
+        UIManager.put("TextPane.selectionForeground", backgroundColor);
+        UIManager.put("Label.background", backgroundColor);
+        UIManager.put("Panel.background", backgroundColor);
+        UIManager.put("ComboBox.background", backgroundColor);
+        UIManager.put("ComboBox.buttonBackground", backgroundColor);
+        UIManager.put("CheckBox.background", backgroundColor);
+        UIManager.put("ToolTip.background", backgroundColor);
+        UIManager.put("TabbedPane.background", backgroundColor);
+        UIManager.put("TabbedPane.tabAreaBackground", backgroundColor);
+        UIManager.put("TabbedPane.contentAreaColor", backgroundColor);
 
-    private static void registerUpdater(String key, ConfigOption<?> option) {
-        option.registerChangeAction((value) -> {
-            UIManager.put(key, value);
+        Config.TEXT_COLOR.registerChangeAction((value) -> {
+            repaintAll();
         });
 
-        UIManager.put(key, option.get());
+        Config.OUTLINE_COLOR.registerChangeAction((value) -> {
+            repaintAll();
+        });
+
+        Config.CARET_COLOR.registerChangeAction((value) -> {
+            repaintAll();
+        });
+
+        Config.SELECTION_COLOR.registerChangeAction((value) -> {
+            repaintAll();
+        });
+
+        Config.BACKGROUND_COLOR.registerChangeAction((value) -> {
+            repaintAll();
+        });
     }
 
     /**

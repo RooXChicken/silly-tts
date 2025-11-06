@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import org.loveroo.sillytts.config.Config.ConfigElement;
 import org.loveroo.sillytts.config.Config.ConfigOption;
+import org.loveroo.sillytts.util.ColorModifier;
 
 public class ColorOption extends ConfigOption<Color> {
 
@@ -13,7 +14,14 @@ public class ColorOption extends ConfigOption<Color> {
     
     @Override
     public void load(Object value) {
-        set(new Color((Integer) value));
+        ColorModifier.setColor(get(), new Color((Integer) value));
+        set(get());
+    }
+
+    @Override
+    public void set(Object value) {
+        ColorModifier.setColor(get(), (Color) value);
+        super.set(get());
     }
 
     @Override
