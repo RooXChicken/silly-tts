@@ -1,6 +1,7 @@
 package org.loveroo.sillytts.config.custom;
 
 import java.awt.Color;
+import java.awt.Frame;
 
 import org.loveroo.sillytts.config.Config.ConfigElement;
 import org.loveroo.sillytts.config.Config.ConfigOption;
@@ -22,7 +23,15 @@ public class ColorOption extends ConfigOption<Color> {
     @Override
     public void set(Object value) {
         ATWValueModifier.setColor(get(), (Color) value);
+        repaintAll();
+        
         super.set(get());
+    }
+
+    private static void repaintAll() {
+        for(var frame : Frame.getFrames()) {
+            frame.repaint();
+        }
     }
 
     @Override

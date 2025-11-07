@@ -8,7 +8,6 @@ import java.awt.event.MouseListener;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -25,11 +24,16 @@ import org.loveroo.sillytts.config.Config;
 import org.loveroo.sillytts.config.Config.ConfigElement;
 import org.loveroo.sillytts.config.Config.ConfigOption;
 import org.loveroo.sillytts.config.Config.FilePath;
+import org.loveroo.sillytts.config.custom.KeybindOption;
 import org.loveroo.sillytts.util.AudioSystem;
 import org.loveroo.sillytts.window.gui.BorderlessComboBox;
 import org.loveroo.sillytts.window.gui.CheckBoxIcon;
 import org.loveroo.sillytts.window.gui.CustomTabbedPane;
 import org.loveroo.sillytts.window.gui.SimpleDocumentListener;
+import org.loveroo.sillytts.window.gui.element.Button;
+import org.loveroo.sillytts.window.gui.element.CheckBox;
+import org.loveroo.sillytts.window.gui.element.ComboBox;
+import org.loveroo.sillytts.window.gui.element.TextPane;
 
 public class SettingsWindow extends JFrame {
     
@@ -41,6 +45,7 @@ public class SettingsWindow extends JFrame {
         setSize(Window.SETTINGS.getWidth(), Window.SETTINGS.getHeight());
 
         final var tabPane = new JTabbedPane();
+
         tabPane.setUI(new CustomTabbedPane());
         tabPane.setBounds(0, 0, getWidth() - 3, getHeight() - 31);
 
@@ -56,11 +61,19 @@ public class SettingsWindow extends JFrame {
         );
 
         final var visualPane = new SettingsPane(
-            // Config.FONT_SIZE,
             Config.BACKGROUND_COLOR,
+            Config.COMPONENT_BACKGROUND_COLOR,
             Config.OUTLINE_COLOR,
             Config.CARET_COLOR,
             Config.SELECTION_COLOR
+        );
+
+        final var keybindPane = new SettingsPane(
+            Config.OPEN_TTS_WINDOW_KEYBIND,
+            Config.SEND_TTS_KEYBIND,
+            Config.MINIMIZE_TTS_KEYBIND,
+            Config.CLOSE_TTS_KEYBIND,
+            Config.OPEN_SETTINGS
         );
         
         final var appPane = new SettingsPane(
@@ -69,8 +82,8 @@ public class SettingsWindow extends JFrame {
             Config.MINIMIZE_ON_X
         );
         
-        final var audioDeviceLabel = SettingsPane.createLabel(Config.OUTPUT_DEVICE.getConfigElement(), 14);
-        var audioDevice = new JComboBox<>(new String[0]);
+        final var audioDeviceLabel = SettingsPane.createLabel(Config.OUTPUT_DEVICE.getConfigElement(), 18);
+        var audioDevice = new ComboBox<>(new String[0]);
         
         audioDevice.addActionListener((action) -> {
             var selection = audioDevice.getSelectedItem();
@@ -81,7 +94,7 @@ public class SettingsWindow extends JFrame {
             Config.OUTPUT_DEVICE.set(selection);
         });
         
-        audioDevice.setBounds(0, 14, Window.SETTINGS.getWidth() - 42, 35);
+        audioDevice.setBounds(0, 18, Window.SETTINGS.getWidth() - 42, 35);
         audioDevice.setUI(new BorderlessComboBox());
         audioDevice.setMaximumRowCount(8);
         audioDevice.setToolTipText(ConfigElement.OUTPUT_DEVICE.getDescription());
@@ -99,6 +112,7 @@ public class SettingsWindow extends JFrame {
         tabPane.addTab("Audio", audioPane);
         tabPane.addTab("Piper", piperPane);
         tabPane.addTab("Visual", visualPane);
+        tabPane.addTab("Keybind", keybindPane);
         tabPane.addTab("App", appPane);
 
         add(tabPane);
@@ -146,8 +160,8 @@ public class SettingsWindow extends JFrame {
 
     static class SettingsPane extends JLayeredPane {
 
-        private static final int ELEMENT_START = 14;
-        private static final int ELEMENT_HEIGHT = 48;
+        private static final int ELEMENT_START = 18;
+        private static final int ELEMENT_HEIGHT = 60;
 
         @SuppressWarnings("unchecked")
         public SettingsPane(ConfigOption<?> ... options) {
@@ -178,6 +192,9 @@ public class SettingsWindow extends JFrame {
                 }
                 else if(option.getDefaultValue().getClass() == Color.class) {
                     optionComponent = createColorPickerOption((ConfigOption<Color>) option, y);
+                }
+                else if(option.getClass() == KeybindOption.class) {
+                    optionComponent = createKeybindOption((KeybindOption) option, y);
                 }
                 
                 if(optionComponent != null) {
@@ -214,7 +231,7 @@ public class SettingsWindow extends JFrame {
         }
 
         private JComponent createCheckOption(ConfigOption<Boolean> option, int y) {
-            var checkBox = new JCheckBox();
+            var checkBox = new CheckBox();
             checkBox.setIcon(new CheckBoxIcon());
             checkBox.setBounds(0, y, 32, 32);
             
@@ -291,8 +308,14 @@ public class SettingsWindow extends JFrame {
             return path;
         }
 
+        private JComponent createKeybindOption(KeybindOption option, int y) {
+            var button = createButton(option.getKeybind().getKeyBinding().getDisplayString(), new Rectangle(0, y, 192, 35), (event) -> { });
+
+            return button;
+        }
+
         private JTextPane createTextPane(ConfigOption<?> option, int y, TextPaneOnChange event) {
-            var textBox = new JTextPane();
+            var textBox = new TextPane();
             textBox.setBounds(0, y, Window.SETTINGS.getWidth() - 42, 35);
 
             textBox.setText(String.valueOf(option.get()));
@@ -306,7 +329,7 @@ public class SettingsWindow extends JFrame {
         }
 
         private JButton createButton(String name, Rectangle bounds, ActionListener event) {
-            var button = new JButton(name);
+            var button = new Button(name);
             button.setBounds(bounds);
 
             button.addActionListener(event);
@@ -315,8 +338,8 @@ public class SettingsWindow extends JFrame {
         }
 
         private static JLabel createLabel(ConfigElement option, int y) {
-            var label = new JLabel(" " + option.getShownName());
-            label.setBounds(12, y - 14, (int) label.getPreferredSize().getWidth() + 12, (int) label.getPreferredSize().getHeight());
+            var label = new JLabel(option.getShownName());
+            label.setBounds(2, y - 18, (int) label.getPreferredSize().getWidth(), (int) label.getPreferredSize().getHeight());
             label.setOpaque(true);
             label.setToolTipText(option.getDescription());
 

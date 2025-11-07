@@ -1,0 +1,4 @@
+message history
+configurable replacements
+sound replacements (EX: :tada: -> inserts a tada sound effect in place of :tada: in the audio stream (very complex idk))
+keybind to stop tts audio

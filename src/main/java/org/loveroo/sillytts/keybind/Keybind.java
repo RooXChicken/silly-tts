@@ -5,27 +5,32 @@ import java.awt.event.KeyListener;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.loveroo.sillytts.Main;
 import org.loveroo.sillytts.config.Config;
+import org.loveroo.sillytts.config.custom.KeybindOption;
 import org.loveroo.sillytts.window.SettingsWindow;
 import org.loveroo.sillytts.window.TTSInputWindow;
 
 public enum Keybind {
     
-    SEND_TTS_KEYBIND(new KeyBinding(() -> { Main.getTTSWindow().sendTTS(); }, Config.SEND_TTS_KEYBIND)),
-    MINIMIZE_TTS_KEYBIND(new KeyBinding(() -> { Main.setEnabled(false); }, Config.MINIMIZE_TTS_KEYBIND)),
-    CLOSE_TTS_KEYBIND(new KeyBinding(() -> { System.exit(0); }, Config.CLOSE_TTS_KEYBIND)),
-    OPEN_TTS_WINDOW_KEYBIND(new KeyBinding(() -> {
+    SEND_TTS_KEYBIND(false, new KeyBinding(Config.SEND_TTS_KEYBIND, () -> { Main.getTTSWindow().sendTTS(); })),
+    MINIMIZE_TTS_KEYBIND(false, new KeyBinding(Config.MINIMIZE_TTS_KEYBIND, () -> { Main.setEnabled(false); })),
+    CLOSE_TTS_KEYBIND(false, new KeyBinding(Config.CLOSE_TTS_KEYBIND, () -> { System.exit(0); })),
+    OPEN_TTS_WINDOW_KEYBIND(true, new KeyBinding(Config.OPEN_TTS_WINDOW_KEYBIND, () -> {
             var lock = new TTSInputWindow.UpdateTextLock();
             lock.start();
 
             Main.setEnabled(true);
-        }, Config.OPEN_TTS_WINDOW_KEYBIND)),
+        })),
 
-    OPEN_SETTINGS(new KeyBinding(() -> { new SettingsWindow(); }, Config.OPEN_SETTINGS));
+    OPEN_SETTINGS(false, new KeyBinding(Config.OPEN_SETTINGS, () -> { new SettingsWindow(); }));
 
     private final KeyBinding keyBinding;
+    private final boolean isAWT;
 
-    Keybind(KeyBinding keyBinding) {
+    Keybind(boolean isAWT, KeyBinding keyBinding) {
+        this.isAWT = isAWT;
+
         this.keyBinding = keyBinding;
+        this.keyBinding.setKeybind(this);
     }
 
     public KeyBinding getKeyBinding() {
@@ -38,5 +43,16 @@ public enum Keybind {
 
     public KeyListener getATWListener() {
         return getKeyBinding().getATWListener();
+    }
+
+    public boolean isAWT() {
+        return isAWT;
+    }
+
+    static {
+        for(var keybind : values()) {
+            var option = Config.ConfigElement.valueOf(keybind.name());
+            ((KeybindOption) Config.getConfig(option)).setKeybind(keybind);
+        }
     }
 }

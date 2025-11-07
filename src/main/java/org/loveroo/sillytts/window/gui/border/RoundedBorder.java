@@ -1,4 +1,4 @@
-package org.loveroo.sillytts.window.gui;
+package org.loveroo.sillytts.window.gui.border;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -35,12 +35,30 @@ public class RoundedBorder implements Border {
     public void paintBorder(Component component, Graphics graphics, int x, int y, int width, int height) {
         var g2d = (Graphics2D) graphics.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setColor(getColor());
-        g2d.setStroke(new BasicStroke(2.8f));
 
-        final int padding = 1;
-        g2d.draw(new RoundRectangle2D.Double(x + padding, y + padding, width - 1 - padding*2, height - 1 - padding*2, getRadius(), getRadius()));
+        var rect = getRect(x, y, width, height);
+
+        // g2d.setClip(rect);
+
+        // g2d.setColor(Config.COMPONENT_BACKGROUND_COLOR.get());
+        // g2d.fill(rect);
+        
+        // g2d.setClip(null);
+        
+        g2d.setColor(getColor());
+        g2d.setStroke(new BasicStroke(getStroke()));
+        g2d.draw(rect);
+
         g2d.dispose();
+    }
+
+    public RoundRectangle2D getRect(int x, int y, int width, int height) {
+        final int padding = 1;
+        return new RoundRectangle2D.Double(x + padding, y + padding, (width - 1) - padding*2, (height - 1) - padding*2, getRadius(), getRadius());
+    }
+
+    protected float getStroke() {
+        return 2.8f;
     }
 
     @Override
@@ -51,6 +69,6 @@ public class RoundedBorder implements Border {
 
     @Override
     public boolean isBorderOpaque() {
-        return false;
+        return true;
     }
 }

@@ -1,9 +1,12 @@
 package org.loveroo.sillytts.window.gui;
 
 import java.awt.Component;
+import java.awt.Graphics;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicComboBoxUI;
@@ -12,6 +15,8 @@ import org.loveroo.sillytts.config.Config;
 
 public class BorderlessComboBox extends BasicComboBoxUI {
 
+    private JButton arrowButton;
+
     @Override
     protected void installDefaults() {
         super.installDefaults();
@@ -19,15 +24,21 @@ public class BorderlessComboBox extends BasicComboBoxUI {
         comboBox.setRenderer(new CellRenderer(comboBox));
     }
 
-    // @Override
-    // protected JButton createArrowButton() {
-    //     var button = super.createArrowButton();
-        
+    @Override
+    protected JButton createArrowButton() {
+        var button = super.createArrowButton();
 
-    //     button.setSize(48, 48);
+        arrowButton = button;
 
-    //     return button;
-    // }
+        return button;
+    }
+
+    @Override
+    public void paint(Graphics g, JComponent c) {
+        arrowButton.setBounds(arrowButton.getX() - 4, arrowButton.getY() - 4, 24, 24);
+
+        super.paint(g, c);
+    }
 
     static class CellRenderer extends DefaultListCellRenderer {
 
@@ -42,12 +53,12 @@ public class BorderlessComboBox extends BasicComboBoxUI {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             if(!box.isPopupVisible()) {
-                list.setSelectionBackground(Config.BACKGROUND_COLOR.get());
+                list.setSelectionBackground(Config.COMPONENT_BACKGROUND_COLOR.get());
                 list.setSelectionForeground(Config.TEXT_COLOR.get());
             }
             else {
                 list.setSelectionBackground(Config.OUTLINE_COLOR.get());
-                list.setSelectionForeground(Config.BACKGROUND_COLOR.get());
+                list.setSelectionForeground(Config.COMPONENT_BACKGROUND_COLOR.get());
             }
 
             if(list.getBorder() == null) {

@@ -15,8 +15,11 @@ import org.json.JSONObject;
 import org.loveroo.sillytts.config.custom.ColorOption;
 import org.loveroo.sillytts.config.custom.FilePathOption;
 import org.loveroo.sillytts.config.custom.HashMapOption;
-import org.loveroo.sillytts.config.custom.ListOption;
+import org.loveroo.sillytts.config.custom.KeybindOption;
 
+/**
+ * Stores all configuration options
+ */
 public class Config {
 
     private static final String CONFIG_PATH = "config.json";
@@ -36,15 +39,16 @@ public class Config {
     public static final ConfigOption<String> PIPER_COMMAND = new ConfigOption<>(ConfigElement.PIPER_COMMAND, "python3 -m piper");
     public static final ConfigOption<FilePath> VOICE_MODEL = new FilePathOption(ConfigElement.VOICE_MODEL, new FilePath(""));
 
-    public static final ConfigOption<List<Integer>>
-        SEND_TTS_KEYBIND = new ListOption<>(ConfigElement.SEND_TTS_KEYBIND, List.of(KeyEvent.VK_SHIFT, KeyEvent.VK_ENTER)),
-        MINIMIZE_TTS_KEYBIND = new ListOption<>(ConfigElement.MINIMIZE_TTS_KEYBIND, List.of(KeyEvent.VK_ESCAPE)),
-        CLOSE_TTS_KEYBIND = new ListOption<>(ConfigElement.CLOSE_TTS_KEYBIND, List.of(KeyEvent.VK_ALT, KeyEvent.VK_F4)),
-        OPEN_TTS_WINDOW_KEYBIND = new ListOption<>(ConfigElement.OPEN_TTS_WINDOW_KEYBIND, List.of(125, NativeKeyEvent.VC_F9)),
-        OPEN_SETTINGS = new ListOption<>(ConfigElement.OPEN_SETTINGS, List.of(KeyEvent.VK_CONTROL, KeyEvent.VK_COMMA));
+    public static final KeybindOption
+        SEND_TTS_KEYBIND = new KeybindOption(ConfigElement.SEND_TTS_KEYBIND, List.of(KeyEvent.VK_SHIFT, KeyEvent.VK_ENTER)),
+        MINIMIZE_TTS_KEYBIND = new KeybindOption(ConfigElement.MINIMIZE_TTS_KEYBIND, List.of(KeyEvent.VK_ESCAPE)),
+        CLOSE_TTS_KEYBIND = new KeybindOption(ConfigElement.CLOSE_TTS_KEYBIND, List.of(KeyEvent.VK_ALT, KeyEvent.VK_F4)),
+        OPEN_TTS_WINDOW_KEYBIND = new KeybindOption(ConfigElement.OPEN_TTS_WINDOW_KEYBIND, List.of(125, NativeKeyEvent.VC_F9)),
+        OPEN_SETTINGS = new KeybindOption(ConfigElement.OPEN_SETTINGS, List.of(KeyEvent.VK_CONTROL, KeyEvent.VK_COMMA));
 
     public static final ConfigOption<Color>
-        BACKGROUND_COLOR = new ColorOption(ConfigElement.BACKGROUND_COLOR, new Color(20, 20, 20)),
+        BACKGROUND_COLOR = new ColorOption(ConfigElement.BACKGROUND_COLOR, new Color(61, 0, 56)),
+        COMPONENT_BACKGROUND_COLOR = new ColorOption(ConfigElement.COMPONENT_BACKGROUND_COLOR, new Color(48, 48, 48)),
         CARET_COLOR = new ColorOption(ConfigElement.CARET_COLOR, new Color(1.0f, 0.46f, 0.82f)),
         SELECTION_COLOR = new ColorOption(ConfigElement.SELECTION_COLOR, new Color(1.0f, 0.46f, 0.82f)),
         OUTLINE_COLOR = new ColorOption(ConfigElement.OUTLINE_COLOR, new Color(1.0f, 0.46f, 0.82f)),
@@ -88,6 +92,9 @@ public class Config {
         CONST_REPLACEMENTS.getDefaultValue().put("\\/", " slash ");
     }
 
+    /**
+     * Loads the config file from {@link Config#CONFIG_PATH}
+     */
     public static void load() {
         try {
             var configFile = new File(CONFIG_PATH);
@@ -119,6 +126,9 @@ public class Config {
         }
     }
 
+    /**
+     * Saves the configuration to {@link Config#CONFIG_PATH}
+     */
     public static void save() {
         try {
             var json = new JSONObject();
@@ -139,6 +149,15 @@ public class Config {
         catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Returns the associated {@link ConfigOption} from the {@link ConfigElement}
+     * @param option The config
+     * @return The option
+     */
+    public static ConfigOption<?> getConfig(ConfigElement option) {
+        return CONFIGS.get(option);
     }
     
     public static class ConfigOption<T> {
@@ -230,10 +249,10 @@ public class Config {
 
     public static enum ConfigElement {
 
-        WINDOW_NAME("Window Name", "Changes the name of the Main TTS Window"),
-        FONT_SIZE("Font Size", "Changes the sizing of the font (has scaling issues. beware!!)"),
-        MINIMIZE_ON_X("Minimize on Close", "Makes the application stay open in the background when the X button is pressed (to close, press alt+f4)"),
-        TTS_WINDOW_OPEN_DELAY("Window Open Lock Delay", "Prevents text input for X milliseconds after opening the Main TTS Window"),
+        WINDOW_NAME("Window Name", "The name of the Main TTS Window"),
+        FONT_SIZE("Font Size", "The sizing of the font (has scaling issues. beware!!)"),
+        MINIMIZE_ON_X("Minimize on Close", "The application will stay open in the background when the X button is pressed (to quit, press alt+f4)"),
+        TTS_WINDOW_OPEN_DELAY("Window Open Lock Time", "Prevents text input for X milliseconds after opening the Main TTS Window"),
         WORD_REPLACEMENTS("Word Replacements", "Replaces all elements with their corresponding words as long as it is separated by whitespace"),
         CONST_REPLACEMENTS("Constant Replacements", "Replaces all elements with their corresponding values *always*"),
         PIPER_COMMAND("Piper Command", "The command used to execute the Piper TTS"),
@@ -244,6 +263,7 @@ public class Config {
         OPEN_TTS_WINDOW_KEYBIND("Open TTS Keybind", "Opens the Main TTS Window when this keybind is activated"),
         OPEN_SETTINGS("Open Settings Keybind", "Opens the Settings Window when this keybind is activated"),
         BACKGROUND_COLOR("Background Color", "The color of the background"),
+        COMPONENT_BACKGROUND_COLOR("Component Background Color", "The color of the background of components"),
         CARET_COLOR("Caret Color", "The color of the text caret (|)"),
         SELECTION_COLOR("Selection Color", "The color of the text selection"),
         OUTLINE_COLOR("Outline Color", "The color of all rounded outlines"),

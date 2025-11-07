@@ -7,18 +7,27 @@ import java.util.List;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
-import org.loveroo.sillytts.config.Config.ConfigOption;
+import org.loveroo.sillytts.config.custom.KeybindOption;
 
 public class KeyBinding {
 
     private final HashMap<Integer, KeyState> keys = new HashMap<>();
+    
+    private final KeybindOption option;
     private final KeybindEvent event;
 
-    public KeyBinding(KeybindEvent event, ConfigOption<List<Integer>> keys) {
+    private Keybind keybind;
+
+    public KeyBinding(KeybindOption option, KeybindEvent event) {
+        this.option = option;
         this.event = event;
 
-        loadKeys(keys.get());
-        keys.registerChangeAction(this::loadKeys);
+        loadKeys(option.get());
+        option.registerChangeAction(this::loadKeys);
+    }
+
+    public void setKeybind(Keybind keybind) {
+        this.keybind = keybind;
     }
     
     protected void onKeyPress(int keyCode) {
@@ -96,6 +105,27 @@ public class KeyBinding {
                 onKeyRelease(event.getKeyCode());
             }
         };
+    }
+
+    public String getDisplayString() {
+        var builder = new StringBuilder();
+
+        var keys = getOption().get();
+
+        for(var i = 0; i < keys.size(); i++) {
+            var key = keys.get(i);
+            builder.append((keybind.isAWT() ? NativeKeyEvent.getKeyText(key) : KeyEvent.getKeyText(key)));
+
+            if(i < keys.size()-1) {
+                builder.append(" + ");
+            }
+        }
+
+        return builder.toString();
+    }
+
+    public KeybindOption getOption() {
+        return option;
     }
 
     public static enum KeyState {
