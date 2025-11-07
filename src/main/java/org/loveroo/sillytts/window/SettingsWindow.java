@@ -1,24 +1,30 @@
 package org.loveroo.sillytts.window;
 
 import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.loveroo.sillytts.Main;
 import org.loveroo.sillytts.config.Config;
 import org.loveroo.sillytts.config.Config.ConfigElement;
 import org.loveroo.sillytts.config.Config.ConfigOption;
+import org.loveroo.sillytts.config.Config.FilePath;
 import org.loveroo.sillytts.util.AudioSystem;
 import org.loveroo.sillytts.window.gui.BorderlessComboBox;
 import org.loveroo.sillytts.window.gui.CheckBoxIcon;
@@ -36,7 +42,7 @@ public class SettingsWindow extends JFrame {
 
         final var tabPane = new JTabbedPane();
         tabPane.setUI(new CustomTabbedPane());
-        tabPane.setBounds(0, 0, getWidth(), getHeight());
+        tabPane.setBounds(0, 0, getWidth() - 3, getHeight() - 31);
 
         final var piperPane = new SettingsPane(
             Config.PIPER_COMMAND,
@@ -50,10 +56,11 @@ public class SettingsWindow extends JFrame {
         );
 
         final var visualPane = new SettingsPane(
-            Config.OUTLINE_COLOR
-            // Config.OUTLINE_COLOR,
-            // Config.CARET_COLOR,
-            // Config.SELECTION_COLOR
+            // Config.FONT_SIZE,
+            Config.BACKGROUND_COLOR,
+            Config.OUTLINE_COLOR,
+            Config.CARET_COLOR,
+            Config.SELECTION_COLOR
         );
         
         final var appPane = new SettingsPane(
@@ -160,6 +167,9 @@ public class SettingsWindow extends JFrame {
                 if(option.getDefaultValue().getClass() == String.class) {
                     optionComponent = createTextOption((ConfigOption<String>) option, y);
                 }
+                if(option.getDefaultValue().getClass() == FilePath.class) {
+                    optionComponent = createFilePathOption((ConfigOption<FilePath>) option, y);
+                }
                 else if(option.getDefaultValue().getClass() == Integer.class) {
                     optionComponent = createIntegerOption((ConfigOption<Integer>) option, y);
                 }
@@ -182,33 +192,23 @@ public class SettingsWindow extends JFrame {
         }
 
         private JComponent createTextOption(ConfigOption<String> option, int y) {
-            var textBox = new JTextPane();
-            textBox.setBounds(0, y, Window.SETTINGS.getWidth() - 4, 35);
-
-            textBox.getDocument().addDocumentListener(new SimpleDocumentListener((event) -> {
-                option.set(textBox.getText());
-            }));
-
-            textBox.setText(option.get());
-            textBox.setToolTipText(option.getConfigElement().getDescription());
+            var textBox = createTextPane(option, y, (pane, event) -> {
+                option.set(pane.getText());
+            });
 
             return textBox;
         }
 
         private JComponent createIntegerOption(ConfigOption<Integer> option, int y) {
-            var textBox = new JTextPane();
-            textBox.setBounds(0, y, Window.SETTINGS.getWidth() - 4, 35);
-
-            textBox.getDocument().addDocumentListener(new SimpleDocumentListener((event) -> {
+            var textBox = createTextPane(option, y, (pane, event) -> {
                 try {
-                    var value = (int) Double.parseDouble(textBox.getText());
+                    var value = (int) Double.parseDouble(pane.getText());
                     option.set(value);
                 }
                 catch(Exception e) { }
-            }));
+            });
 
-            textBox.setText(String.valueOf(option.get()));
-            textBox.setToolTipText(option.getConfigElement().getDescription());
+            textBox.setSize(96, textBox.getHeight());
 
             return textBox;
         }
@@ -229,17 +229,89 @@ public class SettingsWindow extends JFrame {
         }
 
         private JComponent createColorPickerOption(ConfigOption<Color> option, int y) {
-            var colorPicker = new JColorChooser();
-            colorPicker.setBounds(0, y, 512, 512);
-            
-            colorPicker.getSelectionModel().addChangeListener((event) -> {
-                option.set(colorPicker.getColor());
+            var colorPicker = createTextPane(option, y, (pane, event) -> {
+                try {
+                    var value = (int) Long.parseLong(pane.getText().trim(), 16);
+                    option.set(new Color(value));
+                }
+                catch(Exception e) { }
             });
 
-            colorPicker.setColor(option.get());
-            colorPicker.setToolTipText(option.getConfigElement().getDescription());
+            colorPicker.setSize(128, colorPicker.getHeight());
+            colorPicker.setText(toRGBHex(option.get()));
+
+            var button = createButton("Reset", new Rectangle(colorPicker.getWidth() + 16, y, 96, 35), (event) -> {
+                colorPicker.setText(toRGBHex(option.getDefaultValue()));
+            });
+
+            add(button);
 
             return colorPicker;
+        }
+
+        public String toRGBHex(Color color) {
+            var rgb = color.getRGB();
+
+            var r = (rgb >> 16 & 0xff);
+            var g = (rgb >> 8 & 0xff);
+            var b = (rgb & 0xff);
+
+            var rText = getColorHexComponent(r);
+            var gText = getColorHexComponent(g);
+            var bText = getColorHexComponent(b);
+
+            return (rText + gText + bText).toUpperCase();
+        }
+
+        private String getColorHexComponent(int component) {
+            var text = Integer.toHexString(component);
+            return "0".repeat(2 - text.length()) + text;
+        }
+
+        private JComponent createFilePathOption(ConfigOption<FilePath> option, int y) {
+            var path = createTextPane(option, y, (pane, event) -> {
+                option.get().setPath(pane.getText());
+                option.set(option.get());
+            });
+
+            path.setSize(path.getWidth() - 64, path.getHeight());
+
+            var filePicker = createButton("...", new Rectangle(path.getWidth() + 16, y, 48, 35), (event) -> {
+                var picker = new JFileChooser();
+                var filter = new FileNameExtensionFilter("Piper TTS File", "onnx");
+
+                picker.setFileFilter(filter);
+                if(picker.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    path.setText(picker.getSelectedFile().getAbsolutePath());
+                }
+            });
+
+            add(filePicker);
+
+            return path;
+        }
+
+        private JTextPane createTextPane(ConfigOption<?> option, int y, TextPaneOnChange event) {
+            var textBox = new JTextPane();
+            textBox.setBounds(0, y, Window.SETTINGS.getWidth() - 42, 35);
+
+            textBox.setText(String.valueOf(option.get()));
+            textBox.setToolTipText(option.getConfigElement().getDescription());
+
+            textBox.getDocument().addDocumentListener(new SimpleDocumentListener((documentEvent) -> {
+                event.onChange(textBox, documentEvent);
+            }));
+
+            return textBox;
+        }
+
+        private JButton createButton(String name, Rectangle bounds, ActionListener event) {
+            var button = new JButton(name);
+            button.setBounds(bounds);
+
+            button.addActionListener(event);
+
+            return button;
         }
 
         private static JLabel createLabel(ConfigElement option, int y) {
@@ -249,6 +321,11 @@ public class SettingsWindow extends JFrame {
             label.setToolTipText(option.getDescription());
 
             return label;
+        }
+
+        public static interface TextPaneOnChange {
+
+            public void onChange(JTextPane pane, DocumentEvent event);
         }
     }
 }

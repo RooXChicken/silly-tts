@@ -4,23 +4,24 @@ import java.awt.Color;
 
 import org.loveroo.sillytts.config.Config.ConfigElement;
 import org.loveroo.sillytts.config.Config.ConfigOption;
-import org.loveroo.sillytts.util.ColorModifier;
+import org.loveroo.sillytts.util.ATWValueModifier;
 
 public class ColorOption extends ConfigOption<Color> {
 
     public ColorOption(ConfigElement configElement, Color defaultValue) {
-        super(configElement, defaultValue);
+        super(configElement, new Color(defaultValue.getRGB()));
+        forceSet(defaultValue);
     }
     
     @Override
     public void load(Object value) {
-        ColorModifier.setColor(get(), new Color((Integer) value));
+        ATWValueModifier.setColor(get(), new Color((Integer) value));
         set(get());
     }
 
     @Override
     public void set(Object value) {
-        ColorModifier.setColor(get(), (Color) value);
+        ATWValueModifier.setColor(get(), (Color) value);
         super.set(get());
     }
 

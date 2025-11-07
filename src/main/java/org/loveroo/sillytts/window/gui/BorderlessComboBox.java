@@ -5,7 +5,6 @@ import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JList;
-import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 
@@ -17,11 +16,18 @@ public class BorderlessComboBox extends BasicComboBoxUI {
     protected void installDefaults() {
         super.installDefaults();
 
-        LookAndFeel.uninstallBorder(comboBox);
-        LookAndFeel.installBorder(comboBox, "TextPane.border");
-
         comboBox.setRenderer(new CellRenderer(comboBox));
     }
+
+    // @Override
+    // protected JButton createArrowButton() {
+    //     var button = super.createArrowButton();
+        
+
+    //     button.setSize(48, 48);
+
+    //     return button;
+    // }
 
     static class CellRenderer extends DefaultListCellRenderer {
 
@@ -49,7 +55,7 @@ public class BorderlessComboBox extends BasicComboBoxUI {
             }
 
             // TODO: remove scroll bar (when not needed)
-            // list.setSize(list.getPreferredSize());
+            // list.setSize((int) list.getPreferredSize().getWidth() + 30, (int) list.getPreferredSize().getHeight() + 30);
 
             return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         }

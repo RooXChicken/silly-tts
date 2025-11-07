@@ -1,8 +1,20 @@
 package org.loveroo.sillytts.util;
 
 import java.awt.Color;
+import java.awt.Font;
 
-public class ColorModifier {
+public class ATWValueModifier {
+
+    public static void setFontSize(Font font, int size) {
+        try {
+            final var setSizeField = Font.class.getDeclaredField("size");
+            setSizeField.setAccessible(true);
+            setSizeField.set(font, size);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     /**
      * Modified the values of the color directly to allow hot swapping of colors where it normally isn't supported. Uses reflection

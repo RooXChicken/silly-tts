@@ -52,7 +52,7 @@ public class TTSSystem {
 
         @Override
         public void run() {
-            var piperArgs = String.format(" --model %s --output-raw", Config.VOICE_MODEL.get().trim());
+            var piperArgs = String.format(" --model %s --output-raw", Config.VOICE_MODEL.get().getPath().trim());
 
             try {
                 // pipe echo into piper for file-less playback

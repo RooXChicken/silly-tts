@@ -13,6 +13,7 @@ import java.util.List;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.json.JSONObject;
 import org.loveroo.sillytts.config.custom.ColorOption;
+import org.loveroo.sillytts.config.custom.FilePathOption;
 import org.loveroo.sillytts.config.custom.HashMapOption;
 import org.loveroo.sillytts.config.custom.ListOption;
 
@@ -32,9 +33,8 @@ public class Config {
         WORD_REPLACEMENTS = new HashMapOption<>(ConfigElement.WORD_REPLACEMENTS, new HashMap<>()),
         CONST_REPLACEMENTS = new HashMapOption<>(ConfigElement.CONST_REPLACEMENTS, new HashMap<>());
 
-    public static final ConfigOption<String>
-        PIPER_COMMAND = new ConfigOption<>(ConfigElement.PIPER_COMMAND, "python3 -m piper"),
-        VOICE_MODEL = new ConfigOption<>(ConfigElement.VOICE_MODEL, "");
+    public static final ConfigOption<String> PIPER_COMMAND = new ConfigOption<>(ConfigElement.PIPER_COMMAND, "python3 -m piper");
+    public static final ConfigOption<FilePath> VOICE_MODEL = new FilePathOption(ConfigElement.VOICE_MODEL, new FilePath(""));
 
     public static final ConfigOption<List<Integer>>
         SEND_TTS_KEYBIND = new ListOption<>(ConfigElement.SEND_TTS_KEYBIND, List.of(KeyEvent.VK_SHIFT, KeyEvent.VK_ENTER)),
@@ -188,6 +188,10 @@ public class Config {
             Config.save();
         }
 
+        protected void forceSet(T value) {
+            this.value = value;
+        }
+
         public void load(Object value) {
             set(value);
         }
@@ -202,10 +206,32 @@ public class Config {
         }
     }
 
+    public static class FilePath {
+
+        private String path;
+
+        public FilePath(String path) {
+            this.path = path;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        @Override
+        public String toString() {
+            return getPath();
+        }
+    }
+
     public static enum ConfigElement {
 
         WINDOW_NAME("Window Name", "Changes the name of the Main TTS Window"),
-        FONT_SIZE("Font Size", "Changes the sizing of the font"),
+        FONT_SIZE("Font Size", "Changes the sizing of the font (has scaling issues. beware!!)"),
         MINIMIZE_ON_X("Minimize on Close", "Makes the application stay open in the background when the X button is pressed (to close, press alt+f4)"),
         TTS_WINDOW_OPEN_DELAY("Window Open Lock Delay", "Prevents text input for X milliseconds after opening the Main TTS Window"),
         WORD_REPLACEMENTS("Word Replacements", "Replaces all elements with their corresponding words as long as it is separated by whitespace"),
@@ -223,8 +249,8 @@ public class Config {
         OUTLINE_COLOR("Outline Color", "The color of all rounded outlines"),
         TEXT_COLOR("Text Color", "The color of the text"),
         OUTPUT_DEVICE("Output Device", "The Audio Device the TTS uses for output"),
-        AUDIO_SAMPLE_RATE("Sample Rate", "The sample rate of the TTS model"),
-        AUDIO_CHANNELS("Channel Count", "The channel count of the TTS model");
+        AUDIO_SAMPLE_RATE("Sample Rate", "The sample rate of the TTS model output"),
+        AUDIO_CHANNELS("Channel Count", "The audio channel count of the TTS model");
 
         private final String shownName;
         private final String description;
