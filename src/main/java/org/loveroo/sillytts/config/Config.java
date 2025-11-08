@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.json.JSONObject;
 import org.loveroo.sillytts.config.custom.ColorOption;
@@ -36,8 +38,12 @@ public class Config {
         WORD_REPLACEMENTS = new HashMapOption<>(ConfigElement.WORD_REPLACEMENTS, new HashMap<>()),
         CONST_REPLACEMENTS = new HashMapOption<>(ConfigElement.CONST_REPLACEMENTS, new HashMap<>());
 
-    public static final ConfigOption<String> PIPER_COMMAND = new ConfigOption<>(ConfigElement.PIPER_COMMAND, "python3 -m piper");
-    public static final ConfigOption<FilePath> VOICE_MODEL = new FilePathOption(ConfigElement.VOICE_MODEL, new FilePath(""));
+    // file path but can also be a custom thing. used as a marker to show a file dialog select in settings
+    public static final ConfigOption<FilePath> PIPER_COMMAND = new FilePathOption(ConfigElement.PIPER_COMMAND,
+        new FilePath("python3 -m piper", new FileNameExtensionFilter("Piper Executable", "exe", "*")));
+    
+    public static final ConfigOption<FilePath> VOICE_MODEL = new FilePathOption(ConfigElement.VOICE_MODEL, 
+        new FilePath("", new FileNameExtensionFilter("Piper Voice Files", "onnx")));
 
     public static final KeybindOption
         SEND_TTS_KEYBIND = new KeybindOption(ConfigElement.SEND_TTS_KEYBIND, List.of(KeyEvent.VK_SHIFT, KeyEvent.VK_ENTER)),
@@ -86,6 +92,7 @@ public class Config {
         WORD_REPLACEMENTS.getDefaultValue().put("rn", "right now");
         WORD_REPLACEMENTS.getDefaultValue().put("u", "you");
         WORD_REPLACEMENTS.getDefaultValue().put("ur", "your");
+        WORD_REPLACEMENTS.getDefaultValue().put("intellij", "intelli jay");
 
         CONST_REPLACEMENTS.getDefaultValue().put("\\_", " underscore ");
         CONST_REPLACEMENTS.getDefaultValue().put("\\-", " dash ");
@@ -228,9 +235,11 @@ public class Config {
     public static class FilePath {
 
         private String path;
+        private final FileNameExtensionFilter filter;
 
-        public FilePath(String path) {
+        public FilePath(String path, FileNameExtensionFilter filter) {
             this.path = path;
+            this.filter = filter;
         }
 
         public String getPath() {
@@ -239,6 +248,10 @@ public class Config {
 
         public void setPath(String path) {
             this.path = path;
+        }
+
+        public FileNameExtensionFilter getFilter() {
+            return filter;
         }
 
         @Override

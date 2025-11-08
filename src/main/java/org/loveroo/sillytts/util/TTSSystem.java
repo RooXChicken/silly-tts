@@ -60,7 +60,7 @@ public class TTSSystem {
                     new ProcessBuilder(getOsEchoCommand(input))
                         .inheritIO()
                         .redirectOutput(Redirect.PIPE),
-                    new ProcessBuilder((Config.PIPER_COMMAND.get().trim() + piperArgs).split(" "))
+                    new ProcessBuilder((Config.PIPER_COMMAND.get().getPath().trim() + piperArgs).split(" "))
                         .redirectError(Redirect.DISCARD)
                 ));
 

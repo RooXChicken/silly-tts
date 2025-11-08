@@ -2,6 +2,7 @@ package org.loveroo.sillytts.keybind;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,11 +13,13 @@ import org.loveroo.sillytts.config.custom.KeybindOption;
 public class KeyBinding {
 
     private final HashMap<Integer, KeyState> keys = new HashMap<>();
+    private List<Integer> reboundKeys = null;
     
     private final KeybindOption option;
     private final KeybindEvent event;
 
     private Keybind keybind;
+    private KeybindState state = KeybindState.ACTIVE;
 
     public KeyBinding(KeybindOption option, KeybindEvent event) {
         this.option = option;
@@ -31,6 +34,11 @@ public class KeyBinding {
     }
     
     protected void onKeyPress(int keyCode) {
+        if(state == KeybindState.REBINDING) {
+            reboundKeys.add(keyCode);
+            return;
+        }
+
         if(!keys.containsKey(keyCode)) {
             return;
         }
@@ -44,6 +52,11 @@ public class KeyBinding {
     }
 
     protected void onKeyRelease(int keyCode) {
+        if(state == KeybindState.REBINDING) {
+            endKeyRebind();
+            return;
+        }
+
         if(!keys.containsKey(keyCode)) {
             return;
         }
@@ -69,6 +82,18 @@ public class KeyBinding {
 
     public List<Integer> getKeys() {
         return keys.keySet().stream().toList();
+    }
+
+    public void startKeyRebind() {
+        state = KeybindState.REBINDING;
+        reboundKeys = new ArrayList<>();
+    }
+
+    protected void endKeyRebind() {
+        state = KeybindState.ACTIVE;
+        loadKeys(reboundKeys);
+
+        reboundKeys = null;
     }
 
     public NativeKeyListener getNativeListener() {
@@ -110,7 +135,7 @@ public class KeyBinding {
     public String getDisplayString() {
         var builder = new StringBuilder();
 
-        var keys = getOption().get();
+        var keys = (state == KeybindState.ACTIVE) ? getOption().get() : reboundKeys;
 
         for(var i = 0; i < keys.size(); i++) {
             var key = keys.get(i);
@@ -119,6 +144,10 @@ public class KeyBinding {
             if(i < keys.size()-1) {
                 builder.append(" + ");
             }
+        }
+
+        if(state == KeybindState.REBINDING) {
+            builder.append("...");
         }
 
         return builder.toString();
@@ -132,6 +161,12 @@ public class KeyBinding {
 
         PRESSED,
         RELEASED,
+    }
+
+    public static enum KeybindState {
+
+        ACTIVE,
+        REBINDING,
     }
 
     public static interface KeybindEvent {

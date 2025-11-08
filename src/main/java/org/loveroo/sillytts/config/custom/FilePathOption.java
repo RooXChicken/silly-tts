@@ -12,7 +12,7 @@ public class FilePathOption extends ConfigOption<FilePath> {
 
     @Override
     public void load(Object value) {
-        set(new FilePath((String) value));
+        set(new FilePath((String) value, get().getFilter()));
     }
 
     @Override

@@ -17,7 +17,6 @@ import javax.swing.JLayeredPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.loveroo.sillytts.Main;
 import org.loveroo.sillytts.config.Config;
@@ -295,9 +294,8 @@ public class SettingsWindow extends JFrame {
 
             var filePicker = createButton("...", new Rectangle(path.getWidth() + 16, y, 48, 35), (event) -> {
                 var picker = new JFileChooser();
-                var filter = new FileNameExtensionFilter("Piper TTS File", "onnx");
+                picker.setFileFilter(option.get().getFilter());
 
-                picker.setFileFilter(filter);
                 if(picker.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     path.setText(picker.getSelectedFile().getAbsolutePath());
                 }
@@ -309,7 +307,12 @@ public class SettingsWindow extends JFrame {
         }
 
         private JComponent createKeybindOption(KeybindOption option, int y) {
-            var button = createButton(option.getKeybind().getKeyBinding().getDisplayString(), new Rectangle(0, y, 192, 35), (event) -> { });
+            var button = createButton(option.getKeybind().getKeyBinding().getDisplayString(), new Rectangle(0, y, 192, 35), null);
+
+            button.addActionListener((event) -> {
+                option.getKeybind().getKeyBinding().startKeyRebind();
+                button.setText(option.getKeybind().getKeyBinding().getDisplayString());
+            });
 
             return button;
         }
@@ -332,7 +335,9 @@ public class SettingsWindow extends JFrame {
             var button = new Button(name);
             button.setBounds(bounds);
 
-            button.addActionListener(event);
+            if(event != null) {
+                button.addActionListener(event);
+            }
 
             return button;
         }
