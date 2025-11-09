@@ -21,7 +21,6 @@ public enum Keybind {
 
             Main.setEnabled(true);
         })),
-
     STOP_TTS(true, new KeyBinding(Config.STOP_TTS_KEYBIND, () -> { AudioSystem.stopAll(); })),
     OPEN_SETTINGS(false, new KeyBinding(Config.OPEN_SETTINGS_KEYBIND, () -> { new SettingsWindow(); }));
 

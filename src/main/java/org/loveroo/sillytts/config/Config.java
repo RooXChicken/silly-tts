@@ -36,7 +36,8 @@ public class Config {
 
     public static final ConfigOption<HashMap<String, String>>
         WORD_REPLACEMENTS = new HashMapOption<>(ConfigElement.WORD_REPLACEMENTS, new HashMap<>()),
-        CONST_REPLACEMENTS = new HashMapOption<>(ConfigElement.CONST_REPLACEMENTS, new HashMap<>());
+        CONST_REPLACEMENTS = new HashMapOption<>(ConfigElement.CONST_REPLACEMENTS, new HashMap<>()),
+        SOUND_EFFECTS = new HashMapOption<>(ConfigElement.SOUND_EFFECTS, new HashMap<>());
 
     // file path but can also be a custom thing. used as a marker to show a file dialog select in settings
     public static final ConfigOption<FilePath> PIPER_COMMAND = new FilePathOption(ConfigElement.PIPER_COMMAND,
@@ -93,7 +94,11 @@ public class Config {
         WORD_REPLACEMENTS.getDefaultValue().put("rn", "right now");
         WORD_REPLACEMENTS.getDefaultValue().put("u", "you");
         WORD_REPLACEMENTS.getDefaultValue().put("ur", "your");
+        WORD_REPLACEMENTS.getDefaultValue().put("ud", "you'd");
+        WORD_REPLACEMENTS.getDefaultValue().put("u'd", "you'd");
         WORD_REPLACEMENTS.getDefaultValue().put("intellij", "intelli jay");
+        WORD_REPLACEMENTS.getDefaultValue().put("api", "aiy pee eye");
+        WORD_REPLACEMENTS.getDefaultValue().put("apis", "aiy pee eyes");
 
         CONST_REPLACEMENTS.getDefaultValue().put("\\_", " underscore ");
         CONST_REPLACEMENTS.getDefaultValue().put("\\-", " dash ");
@@ -269,6 +274,7 @@ public class Config {
         TTS_WINDOW_OPEN_DELAY("Window Open Lock Time", "Prevents text input for X milliseconds after opening the Main TTS Window"),
         WORD_REPLACEMENTS("Word Replacements", "Replaces all elements with their corresponding words as long as it is separated by whitespace"),
         CONST_REPLACEMENTS("Constant Replacements", "Replaces all elements with their corresponding values *always*"),
+        SOUND_EFFECTS("Sound Effects", "Replaces all elements with sound effects when surrounded by :: (EX: :tada:) (.mp3 NOT SUPPORTED!)"),
         PIPER_COMMAND("Piper Command", "The command used to execute the Piper TTS"),
         VOICE_MODEL("Voice Model Path", "The path to the voice model"),
         SEND_TTS_KEYBIND("Send TTS Keybind", "Sends the TTS when this keybind is activated"),
