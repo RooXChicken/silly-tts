@@ -9,6 +9,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 
 import org.loveroo.sillytts.config.Config;
@@ -29,13 +30,14 @@ public class BorderlessComboBox extends BasicComboBoxUI {
         var button = super.createArrowButton();
 
         arrowButton = button;
+        arrowButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         return button;
     }
 
     @Override
     public void paint(Graphics g, JComponent c) {
-        arrowButton.setBounds(arrowButton.getX() - 4, arrowButton.getY() - 4, 24, 24);
+        // arrowButton.setBounds(arrowButton.getX() - 4, arrowButton.getY() - 4, 24, 24);
 
         super.paint(g, c);
     }

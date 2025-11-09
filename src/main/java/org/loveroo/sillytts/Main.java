@@ -63,7 +63,9 @@ public class Main {
         try
         {
             GlobalScreen.registerNativeHook();
-            GlobalScreen.addNativeKeyListener(Keybind.OPEN_TTS_WINDOW_KEYBIND.getNativeListener());
+            
+            GlobalScreen.addNativeKeyListener(Keybind.OPEN_TTS_WINDOW.getNativeListener());
+            GlobalScreen.addNativeKeyListener(Keybind.STOP_TTS.getNativeListener());
         }
         catch (Exception e) {
             e.printStackTrace();

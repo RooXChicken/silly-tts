@@ -29,6 +29,7 @@ public class ColorOption extends ConfigOption<Color> {
     }
 
     private static void repaintAll() {
+        System.out.println("Forcing repaint");
         for(var frame : Frame.getFrames()) {
             frame.repaint();
         }

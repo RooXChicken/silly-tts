@@ -42,6 +42,7 @@ public class AudioSystem {
 
         try {
             openal = new OpenAL(factory, device);
+            System.out.println("Created new OpenAL device: " + device);
         }
         catch(Exception e) {
             throw new RuntimeException(e);
@@ -57,6 +58,10 @@ public class AudioSystem {
         }
 
         return List.of();
+    }
+
+    public static void stopAll() {
+        registerOpenAL(Config.OUTPUT_DEVICE.get());
     }
     
     /**

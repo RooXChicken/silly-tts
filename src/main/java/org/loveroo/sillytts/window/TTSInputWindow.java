@@ -30,9 +30,9 @@ public class TTSInputWindow extends JFrame {
         textBox = new TextPane();
         // textBox.setOpaque(false);
 
-        textBox.addKeyListener(Keybind.SEND_TTS_KEYBIND.getATWListener());
-        textBox.addKeyListener(Keybind.MINIMIZE_TTS_KEYBIND.getATWListener());
-        textBox.addKeyListener(Keybind.CLOSE_TTS_KEYBIND.getATWListener());
+        textBox.addKeyListener(Keybind.SEND_TTS.getATWListener());
+        textBox.addKeyListener(Keybind.MINIMIZE_TTS.getATWListener());
+        textBox.addKeyListener(Keybind.CLOSE_TTS.getATWListener());
         textBox.addKeyListener(Keybind.OPEN_SETTINGS.getATWListener());
 
         UpdateTextLock.setTextPane(textBox);

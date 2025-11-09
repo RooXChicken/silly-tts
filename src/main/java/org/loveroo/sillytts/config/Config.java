@@ -50,7 +50,8 @@ public class Config {
         MINIMIZE_TTS_KEYBIND = new KeybindOption(ConfigElement.MINIMIZE_TTS_KEYBIND, List.of(KeyEvent.VK_ESCAPE)),
         CLOSE_TTS_KEYBIND = new KeybindOption(ConfigElement.CLOSE_TTS_KEYBIND, List.of(KeyEvent.VK_ALT, KeyEvent.VK_F4)),
         OPEN_TTS_WINDOW_KEYBIND = new KeybindOption(ConfigElement.OPEN_TTS_WINDOW_KEYBIND, List.of(125, NativeKeyEvent.VC_F9)),
-        OPEN_SETTINGS = new KeybindOption(ConfigElement.OPEN_SETTINGS, List.of(KeyEvent.VK_CONTROL, KeyEvent.VK_COMMA));
+        STOP_TTS_KEYBIND = new KeybindOption(ConfigElement.STOP_TTS_KEYBIND, List.of(125, NativeKeyEvent.VC_F10)),
+        OPEN_SETTINGS_KEYBIND = new KeybindOption(ConfigElement.OPEN_SETTINGS_KEYBIND, List.of(KeyEvent.VK_CONTROL, KeyEvent.VK_COMMA));
 
     public static final ConfigOption<Color>
         BACKGROUND_COLOR = new ColorOption(ConfigElement.BACKGROUND_COLOR, new Color(61, 0, 56)),
@@ -272,9 +273,10 @@ public class Config {
         VOICE_MODEL("Voice Model Path", "The path to the voice model"),
         SEND_TTS_KEYBIND("Send TTS Keybind", "Sends the TTS when this keybind is activated"),
         MINIMIZE_TTS_KEYBIND("Minimize Keybind", "Minimizes the Main TTS Window when this keybind is activated"),
-        CLOSE_TTS_KEYBIND("Quit Keybind", "Quits Silly TTS when this keybind is activated"),
+        CLOSE_TTS_KEYBIND("Quit App Keybind", "Quits Silly TTS when this keybind is activated"),
         OPEN_TTS_WINDOW_KEYBIND("Open TTS Keybind", "Opens the Main TTS Window when this keybind is activated"),
-        OPEN_SETTINGS("Open Settings Keybind", "Opens the Settings Window when this keybind is activated"),
+        OPEN_SETTINGS_KEYBIND("Open Settings Keybind", "Opens the Settings Window when this keybind is activated"),
+        STOP_TTS_KEYBIND("Stop TTS Keybind", "Stops the TTS's current speech when this keybind is activated"),
         BACKGROUND_COLOR("Background Color", "The color of the background"),
         COMPONENT_BACKGROUND_COLOR("Component Background Color", "The color of the background of components"),
         CARET_COLOR("Caret Color", "The color of the text caret (|)"),

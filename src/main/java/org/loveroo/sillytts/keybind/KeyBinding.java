@@ -21,6 +21,10 @@ public class KeyBinding {
     private Keybind keybind;
     private KeybindState state = KeybindState.ACTIVE;
 
+    private RebindStartEvent rebindStartEvent;
+    private RebindUpdateEvent rebindUpdateEvent;
+    private RebindEndEvent rebindEndEvent;
+
     public KeyBinding(KeybindOption option, KeybindEvent event) {
         this.option = option;
         this.event = event;
@@ -35,7 +39,13 @@ public class KeyBinding {
     
     protected void onKeyPress(int keyCode) {
         if(state == KeybindState.REBINDING) {
+            if(reboundKeys.contains(keyCode)) {
+                return;
+            }
+
             reboundKeys.add(keyCode);
+            rebindUpdateEvent.update();
+
             return;
         }
 
@@ -85,15 +95,40 @@ public class KeyBinding {
     }
 
     public void startKeyRebind() {
+        if(state != KeybindState.ACTIVE) {
+            return;
+        }
+
         state = KeybindState.REBINDING;
         reboundKeys = new ArrayList<>();
+
+        rebindStartEvent.start();
     }
 
-    protected void endKeyRebind() {
+    public void endKeyRebind() {
+        if(state != KeybindState.REBINDING) {
+            return;
+        }
+
         state = KeybindState.ACTIVE;
+
+        getOption().set(reboundKeys);
         loadKeys(reboundKeys);
 
         reboundKeys = null;
+        rebindEndEvent.end();
+    }
+
+    public void setRebindStartEvent(RebindStartEvent rebindStartEvent) {
+        this.rebindStartEvent = rebindStartEvent;
+    }
+
+    public void setRebindUpdateEvent(RebindUpdateEvent rebindUpdateEvent) {
+        this.rebindUpdateEvent = rebindUpdateEvent;
+    }
+
+    public void setRebindEndEvent(RebindEndEvent rebindEndEvent) {
+        this.rebindEndEvent = rebindEndEvent;
     }
 
     public NativeKeyListener getNativeListener() {
@@ -133,13 +168,16 @@ public class KeyBinding {
     }
 
     public String getDisplayString() {
-        var builder = new StringBuilder();
-
         var keys = (state == KeybindState.ACTIVE) ? getOption().get() : reboundKeys;
+        if(keys.isEmpty() && state == KeybindState.ACTIVE) {
+            return "Unbound";
+        }
+
+        var builder = new StringBuilder();
 
         for(var i = 0; i < keys.size(); i++) {
             var key = keys.get(i);
-            builder.append((keybind.isAWT() ? NativeKeyEvent.getKeyText(key) : KeyEvent.getKeyText(key)));
+            builder.append((keybind.isNative() ? NativeKeyEvent.getKeyText(key) : KeyEvent.getKeyText(key)));
 
             if(i < keys.size()-1) {
                 builder.append(" + ");
@@ -167,6 +205,21 @@ public class KeyBinding {
 
         ACTIVE,
         REBINDING,
+    }
+
+    public static interface RebindStartEvent {
+
+        public void start();
+    }
+
+    public static interface RebindUpdateEvent {
+
+        public void update();
+    }
+
+    public static interface RebindEndEvent {
+
+        public void end();
     }
 
     public static interface KeybindEvent {

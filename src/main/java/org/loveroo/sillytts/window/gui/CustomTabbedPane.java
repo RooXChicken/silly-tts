@@ -5,16 +5,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
 public class CustomTabbedPane extends BasicTabbedPaneUI {
-
-    @Override
-    public void paint(Graphics g, JComponent c) {
-        super.paint(g, c);
-    }
     
     @Override
     protected void paintText(Graphics g, int tabPlacement, Font font, FontMetrics metrics, int tabIndex, String title, Rectangle textRect, boolean isSelected) {

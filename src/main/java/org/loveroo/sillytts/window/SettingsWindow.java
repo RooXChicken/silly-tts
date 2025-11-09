@@ -3,6 +3,8 @@ package org.loveroo.sillytts.window;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -72,7 +74,8 @@ public class SettingsWindow extends JFrame {
             Config.SEND_TTS_KEYBIND,
             Config.MINIMIZE_TTS_KEYBIND,
             Config.CLOSE_TTS_KEYBIND,
-            Config.OPEN_SETTINGS
+            Config.STOP_TTS_KEYBIND,
+            Config.OPEN_SETTINGS_KEYBIND
         );
         
         final var appPane = new SettingsPane(
@@ -307,12 +310,65 @@ public class SettingsWindow extends JFrame {
         }
 
         private JComponent createKeybindOption(KeybindOption option, int y) {
-            var button = createButton(option.getKeybind().getKeyBinding().getDisplayString(), new Rectangle(0, y, 192, 35), null);
+            var keybind = option.getKeybind().getKeyBinding();
+            var button = createButton(keybind.getDisplayString(), new Rectangle(0, y, 192, 35), null);
+            button.setToolTipText(option.getConfigElement().getDescription());
+
+            button.addFocusListener(new FocusListener() {
+
+                @Override
+                public void focusGained(FocusEvent e) { }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    keybind.endKeyRebind();
+                }
+            });
 
             button.addActionListener((event) -> {
                 option.getKeybind().getKeyBinding().startKeyRebind();
-                button.setText(option.getKeybind().getKeyBinding().getDisplayString());
             });
+
+            if(!option.getKeybind().isNative()) {
+                var keyListener = keybind.getATWListener();
+
+                keybind.setRebindStartEvent(() -> {
+                    button.setText(keybind.getDisplayString());
+                    button.addKeyListener(keyListener);
+                });
+
+                keybind.setRebindUpdateEvent(() -> {
+                    button.setText(keybind.getDisplayString());
+                });
+
+                keybind.setRebindEndEvent(() -> {
+                    button.setText(keybind.getDisplayString());
+                    button.removeKeyListener(keyListener);
+                });
+            }
+            else {
+                keybind.setRebindStartEvent(() -> {
+                    button.setText(keybind.getDisplayString());
+                });
+
+                keybind.setRebindUpdateEvent(() -> {
+                    button.setText(keybind.getDisplayString());
+                });
+
+                keybind.setRebindEndEvent(() -> {
+                    button.setText(keybind.getDisplayString());
+                });
+            }
+
+            var reset = createButton("Reset", new Rectangle(button.getWidth() + 16, y, 96, 35), (event) -> {
+                keybind.endKeyRebind();
+                keybind.loadKeys(option.getDefaultValue());
+                option.set(option.getDefaultValue());
+
+                button.setText(keybind.getDisplayString());
+            });
+
+            add(reset);
 
             return button;
         }
