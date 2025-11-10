@@ -7,6 +7,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Map.Entry;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -16,15 +17,19 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.loveroo.sillytts.Main;
 import org.loveroo.sillytts.config.Config;
 import org.loveroo.sillytts.config.Config.ConfigElement;
 import org.loveroo.sillytts.config.Config.ConfigOption;
 import org.loveroo.sillytts.config.Config.FilePath;
+import org.loveroo.sillytts.config.custom.HashMapOption;
 import org.loveroo.sillytts.config.custom.KeybindOption;
 import org.loveroo.sillytts.util.AudioSystem;
 import org.loveroo.sillytts.window.gui.BorderlessComboBox;
@@ -67,6 +72,10 @@ public class SettingsWindow extends JFrame {
             Config.OUTLINE_COLOR,
             Config.CARET_COLOR,
             Config.SELECTION_COLOR
+        );
+
+        final var sfxPane = new SettingsPane(
+            Config.SOUND_EFFECTS
         );
 
         final var keybindPane = new SettingsPane(
@@ -113,6 +122,7 @@ public class SettingsWindow extends JFrame {
 
         tabPane.addTab("Audio", audioPane);
         tabPane.addTab("Piper", piperPane);
+        tabPane.addTab("Sounds", sfxPane);
         tabPane.addTab("Visual", visualPane);
         tabPane.addTab("Keybind", keybindPane);
         tabPane.addTab("App", appPane);
@@ -197,6 +207,9 @@ public class SettingsWindow extends JFrame {
                 }
                 else if(option.getClass() == KeybindOption.class) {
                     optionComponent = createKeybindOption((KeybindOption) option, y);
+                }
+                else if(option.getClass() == HashMapOption.class) {
+                    optionComponent = createHashMapOption((HashMapOption<?, ?>) option, y);
                 }
                 
                 if(optionComponent != null) {
@@ -295,18 +308,31 @@ public class SettingsWindow extends JFrame {
 
             path.setSize(path.getWidth() - 64, path.getHeight());
 
-            var filePicker = createButton("...", new Rectangle(path.getWidth() + 16, y, 48, 35), (event) -> {
-                var picker = new JFileChooser();
-                picker.setFileFilter(option.get().getFilter());
-
-                if(picker.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                    path.setText(picker.getSelectedFile().getAbsolutePath());
-                }
+            var filePicker = createFilePathButton(path.getWidth() + 16, y, option.get().getFilter(), (text) -> {
+                path.setText(text);
             });
 
             add(filePicker);
 
             return path;
+        }
+
+        private JComponent createFilePathButton(int x, int y, FileNameExtensionFilter filter, OnFilePathChosen event) {
+            var filePicker = createButton("...", new Rectangle(x, y, 48, 35), (buttonEvent) -> {
+                var picker = new JFileChooser();
+                picker.setFileFilter(filter);
+
+                if(picker.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    event.selected(picker.getSelectedFile().getAbsolutePath());
+                }
+            });
+
+            return filePicker;
+        }
+
+        public static interface OnFilePathChosen {
+
+            public void selected(String path);
         }
 
         private JComponent createKeybindOption(KeybindOption option, int y) {
@@ -373,12 +399,96 @@ public class SettingsWindow extends JFrame {
             return button;
         }
 
-        private JTextPane createTextPane(ConfigOption<?> option, int y, TextPaneOnChange event) {
-            var textBox = new TextPane();
-            textBox.setBounds(0, y, Window.SETTINGS.getWidth() - 42, 35);
+        private <K, V> JComponent createHashMapOption(HashMapOption<K, V> option, int y) {
+            var panel = new JPanel();
+            panel.setLayout(null);
 
-            textBox.setText(String.valueOf(option.get()));
-            textBox.setToolTipText(option.getConfigElement().getDescription());
+            var scroll = new JScrollPane(panel);
+            scroll.setBounds(0, y, Window.SETTINGS.getWidth(), Window.SETTINGS.getHeight());
+
+            initHashMapPanel(panel, option);
+
+            return scroll;
+        }
+
+        @SuppressWarnings("unchecked")
+        private <K, V> void initHashMapPanel(JPanel panel, HashMapOption<K, V> option) {
+            final var height = (ELEMENT_HEIGHT - 16);
+
+            panel.removeAll();
+            
+            var index = 0;
+            for(var entry : option.get().entrySet()) {
+                addMapElement(panel, option, entry, index * height);
+                index++;
+            }
+
+            JButton addButton;
+            addButton = createButton("Add", new Rectangle(0, index * height, 64, 35), (event) -> {
+                option.get().put((K) "", (V) "");
+                option.set(option.get());
+
+                initHashMapPanel(panel, option);
+                Main.repaintAll();
+            });
+
+            panel.add(addButton);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <K, V> void addMapElement(JPanel panel, HashMapOption<K, V> option, Entry<K, V> entry, int y) {
+            final var filter = new FileNameExtensionFilter("Audio files", "wav");
+
+            var keyBox = createTextPane(String.valueOf(entry.getKey()), option.getConfigElement().getDescription(), 192, y, (pane, event) -> {
+                var key = pane.getName();
+
+                var value = option.get().get(key);
+                option.get().remove(key);
+
+                key = pane.getText();
+                pane.setName(key);
+                
+                option.get().put((K) key, value);
+                option.set(option.get());
+            });
+
+            keyBox.setName(String.valueOf(entry.getKey()));
+
+            var valueBox = createTextPane(String.valueOf(entry.getValue()), option.getConfigElement().getDescription(), (Window.SETTINGS.getWidth() - 192 - 144), y, (pane, event) -> {
+                option.get().put((K) keyBox.getName(), (V) pane.getText());
+                option.set(option.get());
+            });
+
+            valueBox.setLocation(keyBox.getWidth() + 16, valueBox.getY());
+
+            var filePicker = createFilePathButton(valueBox.getX() + valueBox.getWidth() + 16, valueBox.getY(), filter, (text) -> {
+                valueBox.setText(text);
+            });
+
+            var remove = createButton("-", new Rectangle(filePicker.getX() + filePicker.getWidth() + 16, filePicker.getY(), 32, 35), (event) -> {
+                option.get().remove(keyBox.getName());
+                option.set(option.get());
+
+                initHashMapPanel(panel, option);
+                Main.repaintAll();
+            });
+
+            panel.add(keyBox);
+            panel.add(valueBox);
+            panel.add(filePicker);
+            panel.add(remove);
+        }
+
+        private JTextPane createTextPane(ConfigOption<?> option, int y, TextPaneOnChange event) {
+            return createTextPane(String.valueOf(option.get()), option.getConfigElement().getDescription(), Window.SETTINGS.getWidth() - 42, y, event);
+        }
+
+        private JTextPane createTextPane(String contents, String tooltip, int width, int y, TextPaneOnChange event) {
+            var textBox = new TextPane();
+            textBox.setBounds(0, y, width, 35);
+
+            textBox.setText(contents);
+            textBox.setToolTipText(tooltip);
 
             textBox.getDocument().addDocumentListener(new SimpleDocumentListener((documentEvent) -> {
                 event.onChange(textBox, documentEvent);

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -37,7 +38,7 @@ public class Config {
     public static final ConfigOption<HashMap<String, String>>
         WORD_REPLACEMENTS = new HashMapOption<>(ConfigElement.WORD_REPLACEMENTS, new HashMap<>()),
         CONST_REPLACEMENTS = new HashMapOption<>(ConfigElement.CONST_REPLACEMENTS, new HashMap<>()),
-        SOUND_EFFECTS = new HashMapOption<>(ConfigElement.SOUND_EFFECTS, new HashMap<>());
+        SOUND_EFFECTS = new HashMapOption<>(ConfigElement.SOUND_EFFECTS, new LinkedHashMap<>());
 
     // file path but can also be a custom thing. used as a marker to show a file dialog select in settings
     public static final ConfigOption<FilePath> PIPER_COMMAND = new FilePathOption(ConfigElement.PIPER_COMMAND,

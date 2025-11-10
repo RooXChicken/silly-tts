@@ -72,6 +72,13 @@ public class Main {
         }
     }
 
+    public static void repaintAll() {
+        System.out.println("Forcing repaint");
+        for(var frame : Frame.getFrames()) {
+            frame.repaint();
+        }
+    }
+
     private static Color textColor;
     private static Color caretColor;
     private static Color selectionColor;
