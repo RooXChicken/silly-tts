@@ -107,6 +107,7 @@ public class Main {
         UIManager.put("ToolTip.border", border);
         UIManager.put("ComboBox.border", border);
         UIManager.put("Button.border", border);
+        UIManager.put("PopupMenu.border", border);
 
         UIManager.put("Label.font", getFont());
         UIManager.put("TextPane.font", getFont());
@@ -114,6 +115,7 @@ public class Main {
         UIManager.put("ToolTip.font", getFont());
         UIManager.put("TabbedPane.font", getFont());
         UIManager.put("Button.font", getFont());
+        UIManager.put("MenuItem.font", getFont());
 
         UIManager.put("Label.foreground", textColor);
         UIManager.put("TextPane.foreground", textColor);
@@ -121,11 +123,13 @@ public class Main {
         UIManager.put("ToolTip.foreground", textColor);
         UIManager.put("TabbedPane.foreground", textColor);
         UIManager.put("Button.foreground", textColor);
+        UIManager.put("MenuItem.foreground", textColor);
 
         UIManager.put("TextPane.caretForeground", caretColor);
 
         UIManager.put("ComboBox.selectionBackground", selectionColor);
         UIManager.put("TextPane.selectionBackground", selectionColor);
+        UIManager.put("MenuItem.selectionBackground", selectionColor);
         
         UIManager.put("ComboBox.buttonHighlight", outlineColor);
         UIManager.put("ComboBox.buttonShadow", outlineColor);
@@ -143,10 +147,13 @@ public class Main {
         UIManager.put("Button.select", componentBackgroundColor);
         UIManager.put("Button.focus", componentBackgroundColor);
         UIManager.put("TextPane.selectionForeground", componentBackgroundColor);
+        UIManager.put("MenuItem.selectionForeground", componentBackgroundColor);
         UIManager.put("ComboBox.background", componentBackgroundColor);
         UIManager.put("ComboBox.buttonBackground", componentBackgroundColor);
         UIManager.put("CheckBox.background", componentBackgroundColor);
         UIManager.put("ToolTip.background", componentBackgroundColor);
+        UIManager.put("MenuItem.background", componentBackgroundColor);
+        UIManager.put("MenuItem.borderPainted", componentBackgroundColor);
         
         UIManager.put("Label.background", backgroundColor);
         UIManager.put("Panel.background", backgroundColor);

@@ -72,7 +72,7 @@ public class TTSSystem {
         for(var i = 0; i < streams.length + sounds.size(); i++) {
             if(i < streams.length) {
                 var buf = streams[i];
-                audioData.add(new AudioData(AudioSystem.getFormat(), Arrays.copyOf(buf, buf.length - BUFFER_WHITESPACE)));
+                audioData.add(new AudioData(AudioSystem.getFormat(), Arrays.copyOf(buf, Math.max(0, buf.length - BUFFER_WHITESPACE))));
             }
 
             if(soundIndex < sounds.size()) {

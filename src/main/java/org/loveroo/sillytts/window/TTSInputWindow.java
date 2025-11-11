@@ -12,6 +12,8 @@ import org.loveroo.sillytts.Main;
 import org.loveroo.sillytts.config.Config;
 import org.loveroo.sillytts.keybind.Keybind;
 import org.loveroo.sillytts.util.TTSSystem;
+import org.loveroo.sillytts.window.context.SimpleContextMenu;
+import org.loveroo.sillytts.window.context.SimpleContextMenu.ContextMenu;
 import org.loveroo.sillytts.window.gui.element.TextPane;
 
 public class TTSInputWindow extends JFrame {
@@ -27,8 +29,10 @@ public class TTSInputWindow extends JFrame {
         setSize(Window.TTS_INPUT.getWidth(), Window.TTS_INPUT.getHeight());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
+        var context = new SimpleContextMenu(ContextMenu.MAIN_TTS);
+
         textBox = new TextPane();
-        // textBox.setOpaque(false);
+        textBox.setComponentPopupMenu(context);
 
         textBox.addKeyListener(Keybind.SEND_TTS.getATWListener());
         textBox.addKeyListener(Keybind.MINIMIZE_TTS.getATWListener());
